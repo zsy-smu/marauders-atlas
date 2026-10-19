@@ -1,0 +1,153 @@
+window.MAPART = (() => {
+  const {places}=ATLAS;
+  const path=(d,cl='ink',other='')=>`<path d="${d}" class="${cl}" ${other}/>`;
+  const line=(x1,y1,x2,y2,cl='ink hair')=>`<path d="M${x1} ${y1}L${x2} ${y2}" class="${cl}"/>`;
+  const text=(x,y,t,cl='map-label',other='')=>`<text x="${x}" y="${y}" class="${cl}" ${other}>${t}</text>`;
+  const rect=(x,y,w,h,cl='ink',other='')=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" class="${cl}" ${other}/>`;
+  const circle=(x,y,r,cl='ink')=>`<circle cx="${x}" cy="${y}" r="${r}" class="${cl}"/>`;
+  function seed(n){let a=n;return()=>{a=(a*1664525+1013904223)>>>0;return a/4294967296}}
+  const defs=`<defs><pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(24)"><path d="M0 0V7" stroke="#666148" stroke-width=".75" opacity=".5"/></pattern><pattern id="crosshatch" width="9" height="9" patternUnits="userSpaceOnUse"><path d="M0 9L9 0M-2 2L2 -2M7 11L11 7" stroke="#746c50" stroke-width=".8" opacity=".35"/></pattern><pattern id="water" width="59" height="18" patternUnits="userSpaceOnUse"><path d="M3 5q8 -4 16 0t16 0M32 14q7 -3 16 0" fill="none" stroke="#726d53" stroke-width="1" opacity=".65"/></pattern><pattern id="stone" width="18" height="12" patternUnits="userSpaceOnUse"><path d="M0 0H18M0 6H18M4 0V6M13 6V12" fill="none" stroke="#7b7157" stroke-width=".55" opacity=".4"/></pattern><pattern id="dots" width="12" height="11" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".7" fill="#74694b" opacity=".5"/><circle cx="8" cy="7" r=".5" fill="#74694b" opacity=".4"/></pattern></defs>`;
+  function windowAt(x,y,s=1){return `<g transform="translate(${x} ${y}) scale(${s})">${path('M-4 9V-3Q0 -12 4 -3V9Z','shade')}${line(-5,11,5,11)}${line(0,-5,0,9)}</g>`}
+  function tower(x,y,w=45,h=130,roof=true){let o=`<g transform="translate(${x} ${y})">${path(`M${-w/2} 0V${-h}Q0 ${-h-8} ${w/2} ${-h}V0Z`,'wash')}`;if(roof)o+=path(`M${-w/2-7} ${-h}L0 ${-h-75}L${w/2+7} ${-h}Z`,'shade')+line(0,-h-75,0,-h-92)+path(`M0 ${-h-90}q22 -9 27 4l-27 6`);else o+=path(`M${-w/2} ${-h}v-13h8v9h10v-10h10v10h10v-9h8v13`);for(let j=25;j<h-6;j+=29)o+=windowAt(0,-j,.75);for(let k=0;k<6;k++)o+=line(-w/2+4,-k*23-3,w/2-3,-k*23-6);o+=path(`M${w/2-7} -2V${-h+3}`,'ink hair');return o+'</g>'}
+  function house(x=0,y=0,s=1,v=0){let w=74+v%3*12,h=53+v%2*12;let o=`<g transform="translate(${x} ${y}) scale(${s})">`;
+    o+=path(`M${-w/2} 0V${-h}L${w/2} ${-h+4}V0Z`,'wash')+path(`M${-w/2-9} ${-h}L-7 ${-h-42}L${w/2+7} ${-h+4}Z`,'shade');
+    o+=path(`M-7 ${-h-42}L${w/2+29} ${-h-31}L${w/2+40} ${-h+7}L${w/2+7} ${-h+4}M${w/2} 0l36 -16v${-h+23}`,'ink');
+    o+=path(`M-21 ${-h-26}v-22h12v8M${w/2-10} ${-h-6}l11 -24`,'ink');
+    for(let a=0;a<4;a++)o+=line(w/2+11+a*6,-h+5,w/2+4+a*6,-h-24,'ink hair');
+    for(let a=0;a<3;a++)o+=windowAt(-w/2+14+a*(w-22)/3,-h+20,.72);
+    o+=path('M-9 0v-23q8 -11 16 0V0Z','ink')+circle(3,-9,.8,'solid');
+    if(v%2)o+=path(`M${-w/2+3} -9L${w/2-4} ${-h+9}M${-w/2+3} ${-h+7}L${w/2-4} -8M${-w/2} -29h${w}`,'ink hair');
+    else for(let a=0;a<4;a++)o+=line(-w/2+5,-8-a*11,w/2-7,-7-a*11,'ink hair');
+    o+=line(-w/2-14,2,w/2+34,2)+path(`M${-w/2-11} 8q29 -5 56 1`,'ink hair');return o+'</g>';
+  }
+  function tree(x,y,s=1,v=0){let o=`<g transform="translate(${x} ${y}) scale(${s})">`;if(v%4===0){o+=path('M-4 0l2 -56M3 0L0 -52M-22 -18l11 -12h-8l12 -14h-6L0 -70l13 26H7l12 14h-8l12 12Z','wash');for(let i=0;i<4;i++)o+=path(`M${-14+i*2} ${-23-i*8}l${12-i*2} 4m4 -5l${9-i} -3`,'ink hair')}
+    else{o+=path('M-3 0l2 -38M4 0L1 -40M0 -11l-10 -17m11 9l11 -15');o+=path('M-17 -28q-13 -10 -5 -20q-5 -12 8 -17q4 -14 16 -9q14 -8 19 6q15 3 10 18q10 13 -4 23q-8 9 -19 3q-14 6 -25 -4Z','wash');for(let i=0;i<4;i++)o+=path(`M${-19+i*9} ${-41-i%2*9}q-5 -8 4 -12m1 20q-6 -6 -1 -10`,'ink hair')}
+    o+=path('M-16 3q17 -5 32 0','ink hair');return o+'</g>'}
+  function forest(x,y,w,h,count,n){const r=seed(n),p=[];for(let i=0;i<count;i++){let xx=x+r()*w,yy=y+r()*h; p.push({xx,yy,s:.5+r()*.5,v:i})}return p.sort((a,b)=>a.yy-b.yy).map(p=>tree(p.xx,p.yy,p.s,p.v)).join('')}
+  function mountain(x,y,w,h,n){const r=seed(n);let o=path(`M${x-w/2} ${y}L${x-13} ${y-h+28}L${x} ${y-h}L${x+21} ${y-h+31}L${x+w/2} ${y}`);o+=path(`M${x-13} ${y-h+28}l15 22 13 -8 18 28 12 -4M${x} ${y-h}l5 51 20 30 -2 16 27 37`,'ink hair');for(let i=0;i<15;i++){let yy=y-h+55+i*(h-50)/15; o+=line(x+8+i*.9,yy,x+w*.22+r()*w*.23,yy+20+r()*20,'ink hair')}return o}
+  function castle(x=0,y=0,s=1){let o=`<g transform="translate(${x} ${y}) scale(${s})">`;o+=path('M-195 39q-30 -15 1 -40l16 -44q38 -20 76 -11l68 -39q70 -13 110 27l74 9 46 51 21 48Z','shade');
+    for(let i=0;i<27;i++)o+=path(`M${-180+i*15} ${i%2?3:-9}l${i%2?-8:6} ${20+i%3*10}m-2 -15l9 -7`,'ink hair');
+    o+=house(-81,-25,1.5,1)+house(45,-31,1.25,2)+house(131,-16,.9,3);o+=tower(-130,-36,43,105,false)+tower(-43,-44,45,191)+tower(70,-40,34,151)+tower(131,-24,29,106,false)+tower(-182,-12,29,79)+tower(1,-18,53,82,false);
+    o+=path('M-12 -19v-32q14 -24 27 0v32','shade')+path('M-26 -18h55m-50 5h44m-36 6h28');o+=path('M-97 -32h70M18 -31h39','ink hair');return o+'</g>'}
+  function willow(){return `<g>${path('M-8 0q17 -29 8 -70q-21 4 -42 -15m44 24q25 -10 33 -37M4 -37q-21 -2 -30 -25M0 -59q17 -27 5 -51M-37 -82l-12 -17m46 -2l-15 -17M29 -91l20 -14M-13 -52l-24 10M9 -88l20 -32M-15 -4q-21 5 -34 0M-3 -4q27 -8 44 6')}${path('M-42 -84q-24 9 -24 39m23 -43q-4 30 -13 48m29 -20q-21 6 -19 25m43 -75q-40 -2 -49 21m60 -20q23 -5 31 12m-4 -3q24 -8 38 11m-32 -13q11 37 30 47m-26 -48q17 26 10 44','ink hair')}${circle(-5,-20,4)}</g>`}
+  function greenhouse(){let o=path('M-95 0v-47l25 -32h140l26 32V0Z','wash')+path('M-95 -47h191M-70 -79l25 32V0M-70 -79V-4M-22 -79v77M22 -79v77M66 -79v77M-95 -23H96','ink hair');for(let i=-79;i<90;i+=22)o+=path(`M${i} -6v-18m0 9q-13 -15 -9 -18q8 -2 9 10q10 -14 13 -10q2 6 -13 10`,'ink hair');return o}
+  function pitch(){let o=`<ellipse cx="0" cy="-24" rx="184" ry="80" class="ink"/><ellipse cx="0" cy="-27" rx="164" ry="60" class="ink hair"/>`;o+=path('M-184 -24v23q180 120 368 0v-23M-2 -84v120','ink hair')+circle(0,-24,33,'ink hair');for(let i=0;i<18;i++){const a=i*Math.PI*2/18,xx=Math.cos(a)*178, yy=Math.sin(a)*76-24;o+=path(`M${xx-9} ${yy}v-44l9 -14 9 14v44M${xx-9} ${yy-44}h18`,'shade')+line(xx,yy-58,xx,yy-73)+path(`M${xx} ${yy-73}l13 4 -13 5`,'ink hair')}for(const xx of [-118,118])for(let i=-1;i<2;i++)o+=line(xx+i*17,-29,xx+i*17,-86-Math.abs(i)*-9)+circle(xx+i*17,-94+Math.abs(i)*9,8);return o}
+  function gate(){return path('M-74 0v-87h17v87m114 0v-87h17v87M-57 -1v-65q57 -41 114 0V-1')+path('M0 -85v83M-40 -63v61m18 -70v70m44 -70v70m18 -61v61M-57 -24H57M-57 -47H57','ink hair')+path('M-88 0h176M-82 -87h32m0 0l-16 -19 -16 19M50 -87h32m0 0l-16 -19 -16 19')}
+  function station(){let o=house(-40,0,1.1,1)+house(62,0,.8,2)+path('M-133 8h273M-145 15h294M-147 23h300','ink');for(let i=-130;i<140;i+=12)o+=line(i,15,i-3,23);o+=rect(-13,-22,26,22,'wash')+rect(-9,-16,18,8,'ink hair');return o}
+  function boat(){return path('M-50 -7q51 15 100 0l-18 25q-30 15 -64 0Z','wash')+path('M-34 -3l69 1m-59 9h48m-31 -15l28 -30m-30 33l-28 -30','ink hair')}
+  function prop(type){let o='';
+    if(type==='castle')return castle(0,0,.72);
+    if(type==='village')return house(-70,5,.7,1)+house(0,-17,1,2)+house(65,9,.72,3);
+    if(['shop','inn','hut','shack','post'].includes(type)){o+=house(-8,3,type==='inn'?1.3:1.05,type==='shack'?3:1);if(type==='post')o+=path('M-13 -85l10 -13 16 13 -4 11H-9Z')+circle(-3,-85,3)+circle(5,-85,3);if(type==='shack')o+=path('M-35 -31l18 -12m-19 6l18 6M13 -30l17 -12m-17 6l17 7');if(type==='shop'||type==='inn')o+=path('M-58 -42h-32v25h32v-21m-16 -4v-9')+line(-85,-10,-57,-10);return o}
+    if(type==='tower')return tower(0,5,58,112);
+    if(type==='willow')return willow();if(type==='greenhouse')return greenhouse();if(type==='pitch')return pitch();if(type==='gate')return gate();if(type==='station')return station();if(type==='boat')return boat();if(type==='forest')return tree(-44,10,.9,1)+tree(35,-15,1.2,4)+tree(0,25,1.2,2);
+    if(type==='lake')return path('M-95 -30q35 -36 89 -10q40 -28 95 6q19 45 -19 54q-42 31 -101 6q-65 2 -64 -56Z','wash')+path('M-70 -13q20 -6 41 0m31 8q27 -7 55 -1m-93 23q25 -4 50 0','ink hair');
+    if(type==='cave')return path('M-69 0l26 -67 38 -24 44 12 34 79Z','shade')+path('M-26 0v-30q27 -41 48 0V0Z','solid')+path('M-41 -60l31 3 20 -20M41 -34l12 29','ink');
+    if(type==='statue'){return path('M-42 9h84v-12H-42Z','shade')+path('M-29 -3q10 -35 5 -59q-26 4 -26 -19q-1 -17 16 -23q21 -11 33 8q10 -1 21 5l-14 6q-2 18 -13 22l24 60Z','wash')+path('M-33 -91l10 -1m-14 10l-8 2m25 19l-2 44m-3 -70l6 2m-8 26q19 -7 26 8M-38 9v8h76V9','ink hair')}
+    if(type==='cauldron'){o+=path('M-52 -35q-6 67 52 65q58 2 52 -65Z','wash')+path('M-57 -35q57 -15 114 0q-57 14 -114 0M-39 25l-8 17m86 -17l8 17M-47 -25q-39 -15 -24 9m117 -9q38 -15 25 9M-32 -51q-13 -19 0 -29m32 26q-12 -27 1 -37m28 39q15 -16 0 -28');return o}
+    if(type==='books'){for(let i=0;i<7;i++)o+=rect(-55+i*16,-49-(i%3)*7,13,78+(i%3)*7,'shade');return o+path('M-67 32H70M-67 37H70','ink')}
+    if(type==='basin'){return path('M-66 -16q65 -25 132 0q-66 24 -132 0Z','wash')+path('M-66 -16q1 32 26 40h80q24 -8 26 -40M-13 25v24h26V25M-3 -24v-32q0 -11 17 -8M-10 -47H9M-22 -90H42v-39H-22Z','ink')+path('M5 -128l-5 14 10 7 -3 12','ink hair')}
+    if(type==='bath'){return path('M-77 -31h154v48q-80 35 -154 0Z','wash')+path('M-77 -31q78 -20 154 0q-78 20 -154 0M-56 25l-8 13m120 -13l8 13M-61 -29v-26q0 -18 16 -9M-52 -56h17M-59 -38q22 -7 45 0m9 4q26 -9 59 -3','ink')}
+    if(type==='trophy'){return path('M-30 -72h60v34q0 28 -30 29q-30 -1 -30 -29ZM-7 -9v30h-21v12h56V21H7V-9M-30 -62h-19v18q0 22 27 26m52 -44h19v18q0 22 -27 26','ink')+path('M-16 -60v20q-1 16 14 18','ink hair')}
+    if(type==='mirror'){return rect(-46,-103,92,139,'shade')+rect(-37,-93,74,118,'wash')+path('M-30 13l56 -88m-47 91l45 -72M-35 36v12m70 -12v12','ink hair')}
+    if(type==='door'){return path('M-46 33v-98q46 -70 92 0v98ZM-35 33v-96q35 -55 70 0v96','ink')+circle(24,-4,3)+line(-1,-83,-1,32,'ink hair')}
+    if(type==='stairs'){for(let i=0;i<8;i++)o+=path(`M${-67+i*8} ${32-i*12}h${138-i*15}v-12h${-130+i*15}`);return o}
+    if(type==='hall'){for(let i=0;i<4;i++)o+=rect(-65+i*35,-65,20,102,'shade');return o+rect(-77,-94,163,15,'ink')}
+    if(type==='kitchen'){return prop('hall')+path('M-70 5q-6 -12 0 -15m35 15q-6 -12 0 -15m35 15q-6 -12 0 -15m35 15q-6 -12 0 -15','ink hair')}
+    if(type==='courtyard'){return rect(-80,-80,160,120,'shade')+rect(-59,-59,118,78,'wash')+circle(0,-18,20)+path('M0 -38v39m-20 -19h40','ink hair')}
+    if(type==='barrel'){return path('M-36 -69q-16 50 0 100q36 13 72 0q16 -50 0 -100Z','wash')+path('M-36 -69q36 13 72 0M-41 -49h82m-87 60h90M-19 -66v94M1 -62v94m20 -95v92','ink hair')}
+    if(type==='fire'){return path('M-65 30v-101H65V30M-49 30v-77H49V30M-74 -76H74v-17H-74Z','shade')+path('M-26 26q-21 -19 1 -45q-1 14 6 16q24 -21 13 -44q48 42 29 73M-36 30H36','ink')}
+    if(type==='serpent'){return path('M-44 23q90 -59 45 -86q-30 -14 -48 2q-14 20 11 28q26 9 48 -8q52 -31 49 -60q-28 -7 -41 16q-9 22 15 28q20 17 -8 30q-25 14 -61 50Z','wash')+circle(48,-89,2,'solid')+path('M60 -96l15 -5m-8 2l6 8','ink hair')}
+    if(type==='eagle'){return path('M0 30l-10 -43q-65 -6 -68 -60q25 28 60 26l4 -30 16 -11 19 9 -17 11 11 23q35 2 63 -23q-6 51 -64 56l-12 42 -10 -15Z','shade')}
+    if(type==='teacup'){return path('M-50 -48h86q-2 65 -43 65q-40 -1 -43 -65ZM37 -38q50 -16 39 13q-7 22 -43 18M-72 27q65 17 133 0M-65 23q65 -14 128 0M-28 -65q-12 -17 2 -27m27 29q12 -22 0 -36','ink')}
+    if(type==='road')return path('M-90 40q12 -49 70 -61q65 -17 89 -65M-67 47q17 -48 70 -58q60 -12 83 -58','ink');
+    return house();
+  }
+  function ribbon(x,y,name,en,w=210){return `<g transform="translate(${x} ${y})">${path(`M${-w/2-21} -16l-28 -6 7 17 -7 15 29 -4M${w/2+21} -16l28 -6 -7 17 7 15 -29 -4`,'ink hair')}${path(`M${-w/2} -27q${w/2} -10 ${w} 0l-3 37q${-w/2} 8 ${-w+6} 0Z`,'ribbon')}${text(0,-1,name)}${en?text(0,33,en,'small-label'):''}</g>`}
+  function marker(p,scale=1,labelY=42,w=215){return `<g class="landmark" tabindex="0" role="button" aria-label="${p.name}，查看档案" data-place="${p.id}" transform="translate(${p.xy[0]} ${p.xy[1]})"><ellipse cx="0" cy="-30" rx="${w*.7}" ry="105" class="marker-halo"/><g transform="scale(${scale})">${prop(p.icon)}</g>${ribbon(0,labelY,p.name,p.en,w)}</g>`}
+  function compass(x,y,s=1){return `<g class="compass" transform="translate(${x} ${y}) scale(${s})">${circle(0,0,37)}${path('M0 -66l10 49 20 -13 -13 20 49 10 -49 10 13 20 -20 -13 -10 49 -10 -49 -20 13 13 -20 -49 -10 49 -10 -13 -20 20 13Z')}${path('M0 -66V66M-66 0H66','ink hair')}${text(0,-80,'N','small-label')}${text(-81,5,'W','small-label')}${text(81,5,'E','small-label')}${text(0,89,'S','small-label')}</g>`}
+  function world(era){let o=defs+`<g id="landscape">`;
+    o+=path('M66 183Q600 71 1179 133T2349 147','ink hair')+path('M60 1370Q739 1480 1530 1466T2350 1389','ink hair');
+    for(let i=0;i<19;i++)o+=mountain(90+i*128,205+(i%3)*20,220,90+(i%4)*19,i);
+    o+=forest(1800,270,485,590,160,445)+forest(135,1070,475,210,90,29)+forest(1900,1120,420,220,60,53);
+    const lake='M1032 945Q979 976 941 1048Q891 1130 997 1239Q1024 1344 1154 1349Q1290 1401 1479 1349Q1730 1363 1875 1255Q1997 1120 1880 1031Q1800 940 1646 951Q1581 892 1518 953Q1316 913 1227 956Z';
+    o+=path(lake,'wash')+path(lake,'ink','style="fill:url(#water);stroke-width:2"');for(let i=0;i<4;i++)o+=path(`M${1040+i*7} ${1010+i*9}q-80 120 15 202`,'ink hair');
+    o+=path('M1290 1184q15 -49 46 -6q-8 25 -23 11q-15 -18 10 -22m-7 27q-40 41 -53 5q-7 -24 10 -15m53 8q58 42 68 7q4 -23 -15 -22m-55 13q44 -42 67 -15m-78 28q0 49 -31 48','ink hair');
+    o+=path('M752 413Q933 234 1118 275Q1202 275 1202 356Q1176 460 1240 549Q1330 612 1276 748M1176 372Q1042 441 948 545Q822 659 653 773M1105 303Q884 430 842 702Q724 976 854 1220Q928 1355 1427 1385Q1805 1421 2268 1384','ink','style="stroke-width:7;stroke:#aea186"');
+    o+=path('M752 413Q933 234 1118 275Q1202 275 1202 356Q1176 460 1240 549Q1330 612 1276 748M1176 372Q1042 441 948 545Q822 659 653 773M1105 303Q884 430 842 702Q724 976 854 1220Q928 1355 1427 1385Q1805 1421 2268 1384','ink hair');
+    o+=path('M55 1340C342 1280 667 1491 1016 1416S1767 1470 2370 1344','ink','style="stroke-width:8;stroke:#8b8165"')+path('M55 1340C342 1280 667 1491 1016 1416S1767 1470 2370 1344','ink','style="stroke-width:12;stroke-dasharray:2 8"');
+    for(let i=0;i<4;i++)o+=path(`M${1020-i*10} ${906+i*8}q70 -66 167 -53l124 -29q190 23 221 91`,'ink hair');
+    for(let i=0;i<48;i++){const r=seed(i+100);o+=path(`M${r()*2100+120} ${r()*1010+290}l${r()*14+4} -2`,'ink hair')}
+    o+=text(2190,920,'SILVA VETITA','calligraphy')+text(1270,1270,'THE GREAT LAKE','calligraphy');
+    o+=compass(220,848,.75);
+    o+=`</g><g id="routes" class="routes">${path('M1260 724C1180 620 1070 545 963 526S734 459 575 426','route','data-route="witch-honey"')}${path('M1570 464Q1428 217 810 252','route','data-route="willow-shack"')}${era==='1998'?path('M1270 701Q1150 462 690 402','route supplement','data-route="ariana"'):''}</g>`;
+    places.filter(p=>p.view==='world').forEach(p=>{const scale={hogwarts:1.8,lake:.5,forest:1.3,hagrid:1.15,willow:1.05,quidditch:.95,greenhouses:1.05,owlery:.85,station:1,gates:.85,boathouse:.85,village:1.55,'shack-world':.9,broomshed:.85}[p.id];if(p.id==='lake')o+=`<g class="landmark" data-place="lake" role="button" tabindex="0" aria-label="黑湖，查看档案">${ribbon(1510,1180,'黑湖 · 大湖','THE GREAT LAKE',230)}</g>`;else if(p.id==='forest')o+=`<g class="landmark" data-place="forest" role="button" tabindex="0" aria-label="禁林，查看档案">${ribbon(2100,670,'禁林','THE FORBIDDEN FOREST',190)}</g>`;else o+=marker(p,scale,p.id==='hogwarts'?100:45,p.id==='hogwarts'?270:p.id==='broomshed'?210:220)});
+    o+=`<g transform="translate(200 1180)">${text(0,0,'HOGWARTS','region-title')}${text(0,42,'School of Witchcraft & Wizardry','calligraphy')}${path('M-128 63q128 -18 256 0','ink hair')}</g>`;return o+`<g id="people"></g><g id="selectedOverlay"></g>`;
+  }
+  function village(era){let o=defs;
+    o+=path('M195 1279Q247 1122 424 1099Q570 1072 662 963Q712 842 873 762Q1002 675 1028 551Q1083 431 1197 365Q1367 264 1445 108','ink','style="stroke-width:43;stroke:#b1a98c55"');
+    o+=path('M182 1279Q233 1112 421 1081Q555 1055 647 954Q699 830 863 745Q990 660 1008 548Q1065 410 1189 347Q1345 250 1428 101M209 1279Q264 1136 430 1117Q585 1090 678 973Q729 854 883 780Q1019 693 1047 559Q1100 452 1210 383Q1384 283 1462 116','ink hair');
+    o+=path('M615 980Q449 928 430 714Q360 418 406 250M1015 563Q824 461 679 488Q527 500 433 705M862 761Q1110 850 1265 778M1207 357Q1111 270 1038 82','ink','style="stroke-width:15;stroke:#b6aa8b77"')+path('M615 980Q449 928 430 714Q360 418 406 250M1015 563Q824 461 679 488Q527 500 433 705M862 761Q1110 850 1265 778M1207 357Q1111 270 1038 82','ink hair');
+    o+=path('M70 111Q306 83 486 133M1310 1130Q1439 1185 1647 1079','ink hair');
+    for(let i=0;i<12;i++)o+=mountain(115+i*146,83+i%3*11,175,58+i%4*12,i);
+    o+=forest(80,360,185,640,47,803)+forest(1420,426,230,700,57,811)+forest(1030,1040,470,180,35,987);
+    const houses=[[510,1090,.6],[760,1140,.7],[960,1120,.7],[300,1110,.65],[1200,1030,.55],[1330,947,.6],[1350,690,.6],[1420,590,.65],[1230,610,.55],[1180,492,.5],[1450,317,.65],[1440,127,.6],[1080,272,.58],[734,289,.6],[610,357,.55],[525,478,.54],[570,610,.55],[750,665,.65],[560,860,.52],[330,839,.6],[315,606,.58],[300,471,.6],[701,819,.6]];
+    houses.forEach((p,i)=>o+=house(...p,i));
+    const r=seed(56);for(let i=0;i<230;i++){let x=290+r()*1080,y=180+r()*1050;o+=path(`M${x} ${y}l${r()*4+1} -1`,'ink hair','style="opacity:.3"')}
+    o+=text(1545,867,'Gardens & orchards','calligraphy','transform="rotate(-80 1545 867)"')+text(239,1040,'To the School Gates','calligraphy','transform="rotate(-62 239 1040)"');
+    o+=`<g id="routes" class="routes">${path('M1162 770q135 163 68 349q-15 86 -30 181','route','data-route="witch-honey"')}${path('M420 242Q220 151 70 308','route','data-route="willow-shack"')}${era==='1998'?path('M480 720Q183 679 26 796','route supplement','data-route="ariana"'):''}</g>`;
+    places.filter(p=>p.view==='village').forEach(p=>{if(p.id==='high-street'){o+=`<g class="landmark" data-place="high-street" role="button" tabindex="0" aria-label="主街，查看档案">${text(895,643,'HIGH STREET','calligraphy','transform="rotate(-39 895 643)"')}</g>`}else o+=marker(p,p.id==='cave'?.65:p.id==='shrieking-shack'?1.15:1.25,p.id==='cave'?33:48,p.name.length>7?240:210)});
+    o+=compass(1550,198,.7)+text(1330,1245,'补充街区图 · 村内不显示人物追踪','no-tracking');
+    o+=`<g transform="translate(240 1230)">${ribbon(0,0,'霍格莫德','HOGSMEADE',230)}</g>`;return o+`<g id="selectedOverlay"></g>`;
+  }
+  function furniture(p,x,y,w,h){let o='';const id=p.id;const usableH=h-68;
+    const desk=(dx,dy,wide=40)=>rect(dx,dy,wide,17,'shade')+rect(dx+7,dy+23,wide-14,8,'ink hair');
+    const bookcase=(dx,dy,wide=105)=>{let q=rect(dx,dy,wide,20,'ink');for(let a=6;a<wide-4;a+=6)q+=line(dx+a,dy+2,dx+a+1,dy+18,'ink hair');return q};
+    if(['history','charms','defence','potions'].includes(id)){for(let row=0;row<3;row++)for(let col=0;col<4;col++){const dx=x+38+col*90,dy=y+46+row*36;o+=desk(dx,dy);if(id==='potions')o+=circle(dx+20,dy+7,6)}o+=desk(x+w/2-58,y+15,116)+bookcase(x+18,y+h-56,95);}
+    else if(['great-hall','kitchen'].includes(id)){for(let col=0;col<4;col++){let dx=x+50+col*85;o+=rect(dx,y+39,33,usableH-21,'shade');for(let row=0;row<5;row++)o+=rect(dx-8,y+44+row*20,6,12,'ink hair')+rect(dx+35,y+44+row*20,6,12,'ink hair')}o+=rect(x+29,y+15,w-58,15,'shade');}
+    else if(id==='library'){for(let col=0;col<3;col++)for(let row=0;row<3;row++)o+=bookcase(x+25+col*126,y+22+row*45,106);o+=rect(x+w-45,y+12,23,h-60,'ink hair');}
+    else if(['myrtle','boys-bathroom'].includes(id)){for(let col=0;col<5;col++){const xx=x+28+col*72;o+=rect(xx,y+22,55,77,'ink hair')+path(`M${xx+10} ${y+99}q32 -2 33 -28`,'ink hair')+circle(xx+27,y+49,12);o+=`<ellipse cx="${xx+28}" cy="${y+usableH+8}" rx="15" ry="9" class="ink"/>`+line(xx+28,y+usableH-3,xx+28,y+usableH+3)}o+=rect(x+15,y+usableH-8,w-30,39,'ink hair')}
+    else if(id==='prefect-bath'){o+=rect(x+62,y+29,w-124,usableH-12,'wash','rx="13"')+rect(x+75,y+42,w-150,usableH-38,'ink hair','rx="8"');for(let a=0;a<15;a++){o+=circle(x+75+a*18,y+35,2);o+=circle(x+75+a*18,y+usableH+13,2)}for(let a=0;a<7;a++)o+=path(`M${x+90+a*30} ${y+70}q12 -5 24 0`,'ink hair');}
+    else if(['gryffindor','slytherin','hufflepuff','ravenclaw'].includes(id)){o+=rect(x+w/2-36,y+14,72,17,'shade');o+=rect(x+w/2-30,y+37,60,45,'ink hair');for(const [dx,dy] of [[x+43,y+46],[x+w-100,y+46],[x+60,y+110],[x+w-110,y+110]])o+=rect(dx,dy,49,23,'wash','rx="6"')+rect(dx+4,dy+4,41,15,'ink hair','rx="4"');o+=circle(x+w/2,y+111,25)+circle(x+w/2,y+111,21,'ink hair');}
+    else if(id==='trophy'){for(let col=0;col<7;col++){o+=rect(x+23+col*53,y+20,37,20,'shade')+circle(x+42+col*53,y+30,4)}for(let row=0;row<2;row++)for(let col=0;col<4;col++)o+=rect(x+35+col*91,y+65+row*52,69,29,'ink hair')+circle(x+54+col*91,y+79+row*52,5)+circle(x+84+col*91,y+79+row*52,5);}
+    else if(id==='courtyard'){o+=rect(x+35,y+30,w-70,usableH-9,'ink hair');for(let col=0;col<11;col++)o+=circle(x+28+col*35,y+23,3)+circle(x+28+col*35,y+usableH+24,3);o+=circle(x+w/2,y+h/2-10,31)+circle(x+w/2,y+h/2-10,24);}
+    else if(id==='requirement'){o+=text(x+w/2,y+usableH/2+24,'?', 'floor-letter')+path(`M${x+21} ${y+usableH+4}h${w-42}`,'ink hair','style="stroke-dasharray:3 7"');}
+    else if(id==='witch'){o+=path(`M${x+70} ${y+25}v${usableH+6}h${w-140}v${-usableH-6}`,'ink hair');o+=`<g transform="translate(${x+w/2} ${y+usableH-6}) scale(.7)">${prop('statue')}</g>`;}
+    else if(id==='mirror'){o+=rect(x+43,y+26,w-86,usableH-12,'shade');o+=path(`M${x+56} ${y+38}h${w-112}v${usableH-36}h${-w+112}Z`,'ink hair');for(let i=0;i<6;i++)o+=path(`M${x+60+i*40} ${y+45}l32 17 -19 27 22 28`,'ink hair');}
+    else if(id==='forbidden-corridor'){o+=rect(x+65,y+24,w-130,usableH-5,'ink hair')+rect(x+w/2-28,y+35,56,56,'shade')+circle(x+w/2+18,y+62,3);}
+    else if(['astronomy','headmaster','divination'].includes(id)){o+=circle(x+w/2,y+usableH/2+20,Math.min(usableH/2-8,w/2-35))+circle(x+w/2,y+usableH/2+20,usableH/2-20,'ink hair');for(let i=0;i<8;i++){let a=i*Math.PI/4,xx=x+w/2+Math.cos(a)*usableH*.32,yy=y+usableH/2+20+Math.sin(a)*usableH*.32;o+=circle(xx,yy,7);if(id==='astronomy')o+=line(xx-9,yy+8,xx+13,yy-14)}}
+    else o+=`<g transform="translate(${x+w/2} ${y+h/2-5}) scale(.65)">${prop(p.icon)}</g>`;
+    return o;
+  }
+  function floor(f,era){let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
+    o+=path('M185 214H1415V952H185ZM207 235H1392V930H207Z','shade','fill-rule="evenodd"')+path('M260 588H1335V646H260ZM758 235H820V930H758Z','wash');
+    for(const [x,y] of [[205,242],[1395,242],[205,930],[1395,930]]){o+=circle(x,y,71,'shade')+circle(x,y,55,'ink');for(let i=0;i<18;i++){let a=i*Math.PI/9;o+=line(x+Math.cos(a)*20,y+Math.sin(a)*20,x+Math.cos(a)*53,y+Math.sin(a)*53,'ink hair')}o+=circle(x,y,19)}
+    o+=text(800,172,ATLAS.floors.find(x=>x[0]===f)[2],'region-title')+text(800,1040,'房间与通行关系为导览重建 · 空白房间不附会名称','small-label');
+    const cells=[[285,300,410,237],[880,300,410,237],[285,700,410,182],[880,700,410,182]];
+    for(let i=0;i<cells.length;i++){const [x,y,w,h]=cells[i],p=rooms[i];if(!p){o+=rect(x,y,w,h,'shade')+rect(x+11,y+11,w-22,h-22,'ink hair');o+=path(`M${x+21} ${y+22}h${w-42}v${h-44}H${x+21}Z`,'ink hair','style="stroke-dasharray:3 9;opacity:.25"');continue}
+      const cx=x+w/2,cy=y+h/2; bounds.push({id:p.id,x:cx,y:cy,w,h});o+=`<g class="landmark" tabindex="0" role="button" data-place="${p.id}" aria-label="${p.name}，查看档案">${rect(x,y,w,h,'map-room',`data-room="${p.id}"`)}${rect(x+8,y+8,w-16,h-16,'ink hair')}${furniture(p,x,y,w,h)}${text(cx,y+h-26,p.name,'room-label')}${text(cx,y+h-9,p.en,'room-en')}${p.blind?text(cx,y+24,'此处为图外附注 · 不显示屋内人物','room-tag'):''}</g>`;
+      const doorX=x+w/2;if(y<550){o+=path(`M${doorX-18} ${y+h}v50m36 -50v50M${doorX-18} ${y+h+40}q36 0 36 -36`,'ink hair')}else o+=path(`M${doorX-18} 646v54m36 -54v54M${doorX-18} 664q36 0 36 36`,'ink hair');
+      for(let j=0;j<5;j++)o+=rect(x+35+j*73,y-6,25,12,'wash');
+    }
+    for(let i=0;i<16;i++)o+=rect(330+i*63,600,5,34,'ink hair');o+=text(1140,680,'CORRIDOR','small-label')+text(735,871,'旋转楼梯','small-label','transform="rotate(-90 735 871)"');
+    o+=`<g transform="translate(800 614)">${circle(0,0,36)}${path('M-24 -5h48m-45 7h42m-36 7h30m-25 7h20','ink hair')}</g>`;
+    o+=`<g id="routes" class="routes">`;
+    if(f==='third')o+=path('M490 536Q412 585 605 622T1088 701','route','data-route="tapestry"')+path('M490 300Q483 221 388 181T140 155','route','data-route="witch-honey"');
+    if(f==='fourth')o+=path('M490 300Q506 232 360 177T130 164',era==='1976'?'route':'route blocked','data-route="mirror"')+text(311,209,era==='1976'?'旧密道 · 终点未明':'× 已坍塌','small-label');
+    if(f==='seventh'&&era==='1998')o+=path('M1090 300Q1191 188 1450 177','route supplement','data-route="ariana"')+text(1305,146,'1998 年附加札记','small-label');
+    o+=`</g><g id="people"></g><g id="selectedOverlay"></g>`;return {svg:o,bounds};
+  }
+  function illustratedWorld(era){let o=defs+'<image href="assets/world-engraving.png" x="0" y="0" width="2400" height="1500" preserveAspectRatio="none"/>';
+    o+=`<g transform="translate(1700 1340) scale(.44)">${station()}</g>`;
+    o+=`<g id="routes" class="routes">${path('M1260 724C1180 620 1070 545 963 526S734 459 575 426','route','data-route="witch-honey"')}${path('M1550 350Q1428 190 740 190','route','data-route="willow-shack"')}${era==='1998'?path('M1270 701Q1150 462 690 402','route supplement','data-route="ariana"'):''}</g>`;
+    for(const p of places.filter(p=>p.view==='world')){let [x,y]=p.xy;let ly=45,w=215;if(p.id==='hogwarts'){ly=90;w=270}if(p.id==='forest'){x=2100;y=595;ly=40}if(p.id==='lake'){x=1450;y=1120;ly=50;w=220}o+=`<g class="landmark" tabindex="0" role="button" aria-label="${p.name}，查看档案" data-place="${p.id}" transform="translate(${x} ${y})"><ellipse cx="0" cy="-30" rx="130" ry="100" class="marker-halo"/><rect x="-120" y="-120" width="240" height="180" fill="transparent"/>${ribbon(0,ly,p.name,p.en,w)}</g>`}
+    return o+compass(215,920,.7)+'<g id="people"></g><g id="selectedOverlay"></g>';
+  }
+  function illustratedVillage(era){let o=defs+'<image href="assets/village-engraving.png" x="0" y="0" width="1800" height="1350" preserveAspectRatio="none"/>';
+    o+=`<g id="routes" class="routes">${path('M1205 760q135 163 68 349q-15 86 -30 181','route','data-route="witch-honey"')}${path('M350 185Q220 151 70 308','route','data-route="willow-shack"')}${era==='1998'?path('M480 965Q183 979 26 1100','route supplement','data-route="ariana"'):''}</g>`;
+    for(const p of places.filter(p=>p.view==='village')){if(p.id==='high-street')continue;const [x,y]=p.xy;const w=p.name.length>7?240:210;o+=`<g class="landmark" tabindex="0" role="button" aria-label="${p.name}，查看档案" data-place="${p.id}" transform="translate(${x} ${y})"><ellipse cx="0" cy="-25" rx="120" ry="90" class="marker-halo"/><rect x="-110" y="-105" width="220" height="155" fill="transparent"/>${ribbon(0,p.id==='cave'?32:52,p.name,p.en,w)}</g>`}
+    o+=`<g class="landmark" data-place="high-street" role="button" tabindex="0" aria-label="主街，查看档案">${text(1000,780,'HIGH STREET','calligraphy','transform="rotate(-39 1000 780)"')}</g>`;
+    return o+'<g id="selectedOverlay"></g>';
+  }
+  return {world,village,illustratedWorld,illustratedVillage,floor,prop,castle,defs,ribbon,seed};
+})();

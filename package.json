@@ -1,0 +1,17 @@
+{
+  "name": "marauders-atlas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A Chinese interactive Marauder's Map and illustrated Hogwarts atlas built with vanilla HTML, CSS, JavaScript and SVG.",
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "check": "node scripts/check.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zsy-smu/marauders-atlas.git"
+  }
+}

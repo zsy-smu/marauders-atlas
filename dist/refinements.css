@@ -1,0 +1,14 @@
+:root{--ink:#303126}
+.paper{background-image:linear-gradient(100deg,#f1eadca3,#ebe1c98c),url('assets/aged-newsprint-texture.png')}
+.index-panel{background-image:linear-gradient(#e7deca77,#dfd6bc88),url('assets/aged-newsprint-texture.png')}
+.detail-panel,dialog{background-image:linear-gradient(#e9dfc994,#e8ddc38c),url('assets/aged-newsprint-texture.png')}
+.folded-map{background-image:linear-gradient(#eae1cb55,#e8dfca44),url('assets/aged-newsprint-texture.png')}
+.ink{stroke:#34372a;stroke-width:1.9}.hair{stroke-width:1.15;opacity:.8}.shade{stroke:#3e402e}.map-label{font-size:26px;stroke-width:5px}.small-label{font-size:12px}.wash{fill:#d4cdb6;stroke:#454731}
+.detail-illustration .wash,.cover-castle .wash{fill:#d4cbb1}
+.canvas{mix-blend-mode:multiply}.canvas svg:has(>image){filter:none;mix-blend-mode:normal}.canvas image{pointer-events:none;opacity:.85}
+.canvas{top:91px}.floor-mode .canvas{top:134px}
+.ribbon{fill:#e1d7bd;stroke:#5e5941;stroke-width:1.3}.map-label{fill:#303426;stroke:#e1d7bd;stroke-width:2px}
+.paper .map-title h2{font-size:30px}.paper .map-title p{font-size:11px;color:#685f4a}
+.detail-open .map-stage{margin-right:340px}.map-stage{transition:margin-right .25s}
+@media(max-width:1100px){.detail-open .map-stage{margin-right:318px}.paper .map-title h2{font-size:24px}}
+@media(max-width:800px){.detail-open .map-stage{margin-right:0}.paper .map-title h2{font-size:25px}.canvas{top:112px}.floor-mode .canvas{top:149px}}
