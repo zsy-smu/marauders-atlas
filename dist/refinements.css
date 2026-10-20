@@ -12,3 +12,16 @@
 .detail-open .map-stage{margin-right:340px}.map-stage{transition:margin-right .25s}
 @media(max-width:1100px){.detail-open .map-stage{margin-right:318px}.paper .map-title h2{font-size:24px}}
 @media(max-width:800px){.detail-open .map-stage{margin-right:0}.paper .map-title h2{font-size:25px}.canvas{top:112px}.floor-mode .canvas{top:149px}}
+/* Blotted-ink reveal and planted impressions, studied from icochi's animation demo. */
+.canvas #map{filter:none;mix-blend-mode:normal}
+.waking .canvas,.closing .canvas{animation:none}
+.waking .paper{animation-duration:1.35s}
+.person .foot{fill:#48392c;stroke:none}
+.person .name-tag{opacity:.9}
+.person .name-scroll,.person .scroll-tail{fill:#ded2b7;stroke:#756045;stroke-width:.85;stroke-linejoin:round}
+.person .scroll-tail{fill:#c8b99a}
+.person .scroll-crease{fill:none;stroke:#8f7c5d;stroke-width:.5}
+.person .name-tag text{font:13px var(--serif);fill:#573c2c;stroke:none;letter-spacing:.035em}
+.waking .name-tag{animation:unrollName 1s .85s both}
+@keyframes unrollName{from{opacity:0}to{opacity:.9}}
+@media(prefers-reduced-motion:reduce){.waking .name-tag{animation:none}.person .name-tag{opacity:.9}}

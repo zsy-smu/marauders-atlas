@@ -22,7 +22,7 @@
   }
   function render(){const m=meta[state.view];base=m.size;$('#sheetTitle').textContent=m.title;$('#sheetSubtitle').textContent=m.sub;$('#sheetNo').textContent=m.sheet;$('#indexTitle').textContent=m.index;$('#indexSubtitle').textContent=m.indexSub;$$('.views button').forEach(b=>b.classList.toggle('chosen',b.dataset.view===state.view));$('#floorStrip').hidden=state.view!=='castle';document.body.classList.toggle('floor-mode',state.view==='castle');
     if(state.view==='world')map.innerHTML=MAPART.illustratedWorld(state.era);else if(state.view==='village')map.innerHTML=MAPART.illustratedVillage(state.era);else{const r=MAPART.floor(state.floor,state.era);map.innerHTML=r.svg;floorBounds=r.bounds;$('#sheetSubtitle').textContent=floors.find(x=>x[0]===state.floor)[1]+' · '+m.sub;}
-    map.setAttribute('aria-label',m.title+'，可拖动缩放，点击建筑查阅档案');map.classList.toggle('tracks-hidden',!state.tracks);$('#routes')?.classList.toggle('hidden',!state.secrets);$$('[data-floor]').forEach(b=>b.classList.toggle('chosen',b.dataset.floor===state.floor));$('#cornerNote').innerHTML=state.view==='village'?'房屋方位为插画重建<br>原著商店名录，点选探索':state.view==='castle'?'空白处不附会房间名称<br>楼层依原著线索与章节索引':'北向与距离为绘图重建<br>点击建筑，展开它的故事';
+    installInkEffects();map.setAttribute('aria-label',m.title+'，可拖动缩放，点击建筑查阅档案');map.classList.toggle('tracks-hidden',!state.tracks);$('#routes')?.classList.toggle('hidden',!state.secrets);$$('[data-floor]').forEach(b=>b.classList.toggle('chosen',b.dataset.floor===state.floor));$('#cornerNote').innerHTML=state.view==='village'?'房屋方位为插画重建<br>原著商店名录，点选探索':state.view==='castle'?'空白处不附会房间名称<br>楼层依原著线索与章节索引':'北向与距离为绘图重建<br>点击建筑，展开它的故事';
     renderList();updateStatus();fit();if(canvas.clientWidth<540){const c=state.view==='world'?[1260,760,2.05]:state.view==='village'?[890,700,1.6]:[800,600,1.45];focus(...c)}else{const c=state.view==='world'?[1200,750,1.12]:state.view==='village'?[900,700,1.1]:[800,600,1.12];focus(...c)}createPeople();highlight();
   }
   function setView(view){closeDetail();state.view=view;state.query='';state.filter='all';$('#search').value='';$$('[data-filter]').forEach(b=>b.classList.toggle('chosen',b.dataset.filter==='all'));state.selected=null;render()}
@@ -45,20 +45,67 @@
     $('#routes')?.classList.remove('hidden');$$('.route').forEach(x=>x.classList.remove('active-route'));const routeEl=map.querySelector(`[data-route="${route}"]`);if(routeEl){routeEl.classList.add('active-route');const b=routeEl.getBBox();let w=Math.max(b.width*1.6,base[0]*.43),h=Math.max(b.height*1.6,base[1]*.45),ratio=canvas.clientWidth/canvas.clientHeight;w=Math.max(w,h*ratio);box={x:b.x+b.width/2-w/2,y:b.y+b.height/2-w/ratio/2,w,h:w/ratio};writeBox()}
     if(route==='mirror')toast(state.era==='1976'?'坍塌前的旧密道 · 原著未明确它的出口':'镜后密道已经坍塌，不能通行。');else if(route==='ariana')toast('1998年附注：阿利安娜肖像 ↔ 有求必应屋\n这是后来形成的通道，非原地图上的第八条旧密道。');else if(route==='willow-shack')toast('按下打人柳节疤 → 根下通道 → 尖叫棚屋\n人物离开校域边缘后，地图不再显示其位置。');else if(route==='witch-honey')toast('Dissendium · 独眼女巫雕像 → 蜂蜜公爵地窖');else toast('奖品陈列室附近的挂毯 → 魔咒课走廊');
   }
-  const footPaths=[`M-3 -8q5 -3 6 2l1 9q-2 5 -6 1Z`,`M-3 -8q-3 -2 -4 3l-1 8q2 5 6 1Z`];
-  let people=[];
+  // Animation study: icochi/The-Marauders-Map. Original SVG art and implementation;
+  // no reference bitmap, footprint sprite or map image is bundled.
+  const svgNS='http://www.w3.org/2000/svg';
+  const footPath='M-2.8-9.5C-6-8.5-5.8-3-4.2.2L-3 2.4 2.6 2.4 3.4-.2C4.9-4.3 4-10-2.8-9.5ZM-2.7 4.3 2.3 4.3 2 7.8Q-.2 9.4-2.8 7.6Z';
+  const footprintLife=14;
+  let people=[],inkTransition=null;
+  function installInkEffects(){
+    inkTransition=null;
+    const artwork=document.createElementNS(svgNS,'g');artwork.id='inkArtwork';
+    while(map.firstChild)artwork.append(map.firstChild);
+    map.append(artwork);
+    const defs=document.createElementNS(svgNS,'defs');
+    // Shared, deterministic pinholes erode ink locally instead of fading the whole shoe.
+    const holes=Array.from({length:52},(_,i)=>({x:((i*47+13)%101)/101*15-7.5,y:((i*31+7)%103)/103*24-12,r:.65+((i*17)%11)/12}));
+    defs.innerHTML=Array.from({length:8},(_,stage)=>`<mask id="footWear${stage}" maskUnits="userSpaceOnUse" x="-10" y="-14" width="20" height="28" style="mask-type:luminance"><rect x="-10" y="-14" width="20" height="28" fill="white"/>${holes.map(h=>`<circle cx="${h.x}" cy="${h.y}" r="${stage===7?18:stage===0?h.r*.12:h.r*(.2+stage*.43)}" fill="black"/>`).join('')}</mask>`).join('')+
+      '<filter id="atlasInkNoise" x="0" y="0" width="100%" height="100%" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="9 13" numOctaves="2" seed="23"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  .33 .34 .33 0 0"/><feComponentTransfer><feFuncA id="inkThreshold" type="linear" slope="18" intercept="1"/></feComponentTransfer></filter><mask id="atlasInkReveal" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox" x="0" y="0" width="1" height="1" style="mask-type:alpha"><rect width="1" height="1" fill="white" filter="url(#atlasInkNoise)"/></mask>';
+    map.prepend(defs);
+  }
+  function transitionInk(opening){
+    if(reduced){$('#inkArtwork').removeAttribute('mask');return}
+    inkTransition={start:performance.now(),duration:opening?2450:1050,opening};
+    $('#inkArtwork').setAttribute('mask','url(#atlasInkReveal)');updateInk(inkTransition.start);
+  }
+  function updateInk(t){
+    if(!inkTransition)return;
+    const progress=Math.min(1,Math.max(0,(t-inkTransition.start)/inkTransition.duration));
+    const eased=progress*progress*(3-2*progress),amount=inkTransition.opening?eased:1-eased;
+    $('#inkThreshold').setAttribute('intercept',String(-18+19*amount));
+    if(progress===1){if(inkTransition.opening)$('#inkArtwork').removeAttribute('mask');inkTransition=null}
+  }
   function createPeople(){people=[];const holder=$('#people');if(!holder)return;let routes;
     if(state.view==='world')routes=[[[1214,842],[1216,680],[1185,530],[1100,340]],[[1370,821],[1570,820],[1790,810],[1990,790]],[[1372,801],[1458,692],[1535,500],[1550,365]],[[900,550],[1030,620],[1150,729],[1273,790]]];
     else routes=[[[337,615],[604,615],[790,615],[1208,615]],[[1217,635],[1028,635],[808,635],[515,635]],[[790,857],[790,714],[790,620],[790,413]],[[790,355],[790,585],[550,615],[337,615]]];
-    eras[state.era].people.forEach((name,i)=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','person');g.innerHTML=Array.from({length:8},(_,j)=>`<path class="foot" data-foot="${j}" d="${footPaths[j%2]}"/>`).join('')+`<path class="name-rule" d="M-12 5h-17m163 0h17"/><text x="0" y="0">${name}</text>`;holder.append(g);const route=routes[i];const lengths=route.slice(1).map((p,j)=>Math.hypot(p[0]-route[j][0],p[1]-route[j][1]));people.push({g,name,route,lengths,total:lengths.reduce((a,b)=>a+b,0),offset:i*.22,speed:state.view==='world'?10:14,scale:state.view==='world'?1:.9})});
+    eras[state.era].people.forEach((name,i)=>{
+      const g=document.createElementNS(svgNS,'g');g.setAttribute('class','person');
+      const width=Math.max(92,name.length*15+24),speed=state.view==='world'?24:26,spacing=state.view==='world'?14:12,pool=Math.ceil(footprintLife*speed/spacing)+2;
+      g.innerHTML=`<g class="foot-trail" aria-hidden="true">${Array.from({length:pool},()=>`<g class="foot-stamp" visibility="hidden"><path class="foot" d="${footPath}"/></g>`).join('')}</g><g class="name-tag" aria-hidden="true"><path class="scroll-tail" d="M-4-12-17-15-13-7-17 0-3-3M${width+3}-12l14-3-4 8 4 7-15-3"/><path class="name-scroll" d="M0-17Q${width/2}-21 ${width}-17L${width} 3Q${width/2}-1 0 3Z"/><path class="scroll-crease" d="M4-16v17M${width-4}-16v17"/><text x="${width/2}" y="-3" text-anchor="middle">${name}</text></g>`;
+      holder.append(g);const route=routes[i],lengths=route.slice(1).map((p,j)=>Math.hypot(p[0]-route[j][0],p[1]-route[j][1]));
+      people.push({g,name,route,lengths,total:lengths.reduce((a,b)=>a+b,0),offset:i*.22,speed,spacing,scale:state.view==='world'?1:.9,label:g.querySelector('.name-tag'),stamps:[...g.querySelectorAll('.foot-stamp')].map(el=>({el,ink:el.firstElementChild,step:null,wear:null}))});
+    });
     updatePeople();
   }
-  function pointOn(p,dist){const d=((dist%p.total)+p.total)%p.total;let prev=0;for(let i=0;i<p.lengths.length;i++){if(d<=prev+p.lengths[i]){const t=(d-prev)/p.lengths[i],a=p.route[i],b=p.route[i+1];return{x:a[0]+(b[0]-a[0])*t,y:a[1]+(b[1]-a[1])*t,a:Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI+90}}prev+=p.lengths[i]}return {x:p.route[0][0],y:p.route[0][1],a:0}}
-  function updatePeople(){for(const p of people){const dist=simTime*p.speed+p.offset*p.total,point=pointOn(p,dist);const textEl=p.g.querySelector('text'),rule=p.g.querySelector('.name-rule');textEl.setAttribute('transform',`translate(${point.x+16} ${point.y-13}) scale(${p.scale})`);rule.setAttribute('transform',`translate(${point.x+16} ${point.y-18}) scale(${p.scale})`);[...p.g.querySelectorAll('.foot')].forEach((el,j)=>{const pt=pointOn(p,dist-j*14),side=(j%2?1:-1)*5;el.setAttribute('transform',`translate(${pt.x+side} ${pt.y}) rotate(${pt.a}) scale(.7)`);el.setAttribute('opacity',String(.85-j*.09))})}}
-  function animate(t){if(!lastFrame)lastFrame=t;const delta=Math.min((t-lastFrame)/1000,.1);lastFrame=t;if(state.active&&!state.paused&&!reduced){simTime+=delta;updatePeople()}animationFrame=requestAnimationFrame(animate)}
+  function pointOn(p,dist){const cycle=((dist%(p.total*2))+p.total*2)%(p.total*2),back=cycle>p.total,d=back?p.total*2-cycle:cycle;let prev=0;for(let i=0;i<p.lengths.length;i++){if(d<=prev+p.lengths[i]){const t=(d-prev)/p.lengths[i],a=p.route[i],b=p.route[i+1];return{x:a[0]+(b[0]-a[0])*t,y:a[1]+(b[1]-a[1])*t,a:Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI+90+(back?180:0)}}prev+=p.lengths[i]}return {x:p.route[0][0],y:p.route[0][1],a:0}}
+  function updatePeople(){for(const p of people){
+    const dist=simTime*p.speed+p.offset*p.total,point=pointOn(p,dist),newest=Math.floor(dist/p.spacing);
+    p.label.setAttribute('transform',`translate(${point.x+20} ${point.y-18}) scale(${p.scale})`);
+    p.stamps.forEach((stamp,j)=>{
+      const step=newest-j,age=(dist-step*p.spacing)/p.speed;
+      if(step<0||age>=footprintLife){stamp.el.setAttribute('visibility','hidden');return}
+      stamp.el.removeAttribute('visibility');
+      // Position is sampled once at landing: old impressions never skate with the person.
+      if(stamp.step!==step){const pt=pointOn(p,step*p.spacing),side=(step%2?1:-1)*4;stamp.el.setAttribute('transform',`translate(${pt.x} ${pt.y}) rotate(${pt.a}) translate(${side} 0) scale(.76)`);stamp.ink.setAttribute('transform',`scale(${step%2?-1:1} 1)`);stamp.el.dataset.step=step;stamp.step=step}
+      const wear=Math.min(7,Math.floor(Math.max(0,age-3.5)/1.5));
+      if(stamp.wear!==wear){stamp.ink.setAttribute('mask',`url(#footWear${wear})`);stamp.el.dataset.wear=wear;stamp.wear=wear}
+      stamp.ink.setAttribute('opacity',String(.82*Math.min(1,age/.18)));
+    });
+  }}
+  function animate(t){if(!lastFrame)lastFrame=t;const delta=Math.min((t-lastFrame)/1000,.1);lastFrame=t;updateInk(t);if(state.active&&!state.paused&&!reduced&&!document.hidden){simTime+=delta;updatePeople()}animationFrame=requestAnimationFrame(animate)}
   function setAwakeAccess(awake){for(const el of [$('.masthead'),$('.workspace'),$('.statusbar')])el.inert=!awake;$('#coverScreen').inert=awake;$('#coverScreen').setAttribute('aria-hidden',String(awake))}
-  function wake(){if(state.active)return;clearTimeout(wakeTimer);document.body.classList.remove('sleeping','closing');document.body.classList.add('awake','waking');state.active=true;setAwakeAccess(true);requestAnimationFrame(()=>{fit();const small=canvas.clientWidth<540;const c=state.view==='world'?[small?1260:1200,760,small?2.05:1.12]:state.view==='village'?[890,700,small?1.6:1.1]:[800,600,small?1.45:1.12];focus(...c)});wakeTimer=setTimeout(()=>{document.body.classList.remove('waking');$('#activate').blur()},1900)}
-  function sleep(){if(!state.active)return;clearTimeout(wakeTimer);closeDetail();state.active=false;document.body.classList.add('closing');wakeTimer=setTimeout(()=>{document.body.classList.remove('awake','closing');document.body.classList.add('sleeping');setAwakeAccess(false);$('#activate').focus()},reduced?0:1150)}
+  function wake(){if(state.active)return;clearTimeout(wakeTimer);document.body.classList.remove('sleeping','closing');document.body.classList.add('awake','waking');state.active=true;setAwakeAccess(true);transitionInk(true);requestAnimationFrame(()=>{fit();const small=canvas.clientWidth<540;const c=state.view==='world'?[small?1260:1200,760,small?2.05:1.12]:state.view==='village'?[890,700,small?1.6:1.1]:[800,600,small?1.45:1.12];focus(...c)});wakeTimer=setTimeout(()=>{document.body.classList.remove('waking');$('#activate').blur()},reduced?0:2550)}
+  function sleep(){if(!state.active)return;clearTimeout(wakeTimer);closeDetail();state.active=false;document.body.classList.remove('waking');document.body.classList.add('closing');transitionInk(false);wakeTimer=setTimeout(()=>{document.body.classList.remove('awake','closing');document.body.classList.add('sleeping');setAwakeAccess(false);$('#activate').focus()},reduced?0:1150)}
   $('#activate').onclick=wake;$('#sleep').onclick=sleep;
   $('.brand').onclick=e=>{e.preventDefault();setView('world')};$$('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));$('#era').onchange=e=>{state.era=e.target.value;const p=places.find(p=>p.id===state.selected);render();if(p)openDetail(p);toast(`已翻到 ${e.target.selectedOptions[0].textContent}\n人物为该年代的示意轨迹。`)};
   $('#floorStrip').innerHTML=floors.map(f=>`<button data-floor="${f[0]}" class="${f[0]===state.floor?'chosen':''}">${f[1]}</button>`).join('');$('#floorStrip').onclick=e=>{const b=e.target.closest('[data-floor]');if(!b)return;state.floor=b.dataset.floor;state.selected=null;closeDetail();render()};

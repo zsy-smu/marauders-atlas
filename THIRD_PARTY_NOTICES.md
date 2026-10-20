@@ -18,6 +18,10 @@
 
 用于讨论和设计的书页照片、原著扫描件以及本地参考视频**未收录在仓库中**。页面的两张地图插画不是书页照片的扫描或直接拷贝。
 
+## 动画设计参考
+
+墨迹显现、交替脚印、足迹纹理消退和姓名卷轴的表现思路参考了 [icochi/The-Marauders-Map](https://github.com/icochi/The-Marauders-Map)。本项目重新编写了 SVG 遮罩、步进轨迹、鞋印和卷轴，实现说明见 [docs/ANIMATION.md](docs/ANIMATION.md)。未复制该仓库的代码、地图、纹理或精灵图；其原有许可证不因本说明而改变。
+
 ## Harry Potter 相关内容
 
 Harry Potter、Hogwarts、Hogsmeade、人物、地名及故事设定的既有权利归各自权利人所有。本项目是非官方同人作品，与官方出版方、电影制作方或授权方没有隶属或背书关系。
