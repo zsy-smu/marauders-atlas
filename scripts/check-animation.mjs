@@ -7,16 +7,16 @@ const start = source.indexOf('  function pointOn(');
 const end = source.indexOf('  function animate(', start);
 assert(start > 0 && end > start, 'Animation functions must exist');
 const element = () => ({
-  attrs: {}, dataset: {},
+  attrs: {}, dataset: {}, style: {},
   setAttribute(key, value) { this.attrs[key] = String(value); },
   removeAttribute(key) { delete this.attrs[key]; },
 });
 const person = {
   route: [[0, 0], [100, 0], [100, 100]], lengths: [100, 100], total: 200,
-  speed: 24, spacing: 14, offset: 0.22, scale: 1, label: element(),
+  speed: 24, spacing: 14, offset: 0.22, scale: 1, width: 82, label: element(),
   stamps: Array.from({ length: 26 }, () => ({ el: element(), ink: element(), step: null, wear: null })),
 };
-const context = vm.createContext({ people: [person], simTime: 20, footprintLife: 14 });
+const context = vm.createContext({ people: [person], labelObstacles: [], simTime: 20, footprintLife: 14, canvas: { clientWidth: 1000 }, box: { x: -500, y: -500, w: 2000, h: 2000 } });
 vm.runInContext(source.slice(start, end), context);
 const point = distance => context.pointOn(person, distance);
 assert.equal(point(25).x, 25);

@@ -5,15 +5,43 @@
   const map=$('#map'),canvas=$('#canvas');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const state={view:'world',floor:'third',era:'1993',filter:'all',query:'',selected:null,active:false,tracks:true,secrets:true,paused:false,zoom:1};
-  let base=[2400,1500],box={x:0,y:0,w:2400,h:1500},fitWidth=2400,floorBounds=[],toastTimer,wakeTimer,animationFrame,lastFrame=0,simTime=0,dragged=false;
+  let base=[2400,1500],box={x:0,y:0,w:2400,h:1500},fitWidth=2400,floorBounds=[],labelObstacles=[],toastTimer,wakeTimer,animationFrame,labelFrame,lastFrame=0,simTime=0,dragged=false,returnFocus=null;
   const meta={world:{title:'霍格沃茨魔法学校',sub:'城堡、场地与霍格莫德周边图',index:'霍格沃茨及周边',indexSub:'城堡、湖泊与通往村庄的小径',sheet:'TABULA I · THE SCHOOL & GROUNDS',size:[2400,1500]},village:{title:'霍格莫德村',sub:'主街、商店与村外秘密 · 补充探索图',index:'霍格莫德地方志',indexSub:'十一处店铺与村外地点，沿主街逐一寻找',sheet:'TABULA III · THE VILLAGE OF HOGSMEADE',size:[1800,1350]},castle:{title:'霍格沃茨城堡',sub:'楼层导览 · 房间形状与相对坐标为重建',index:'城堡里的秘密',indexSub:'从地下到塔楼，沿楼层签逐一翻阅',sheet:'TABULA II · WITHIN THE CASTLE',size:[1600,1100]}};
   function toast(message){clearTimeout(toastTimer);$('#toast').textContent=message;$('#toast').classList.add('show');toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),3700)}
-  function writeBox(){map.setAttribute('viewBox',`${box.x} ${box.y} ${box.w} ${box.h}`);state.zoom=fitWidth/box.w;$('#zoomLabel').textContent=Math.round(state.zoom*100)+'%';$('#zoomIn').disabled=state.zoom>=4.95;$('#zoomOut').disabled=state.zoom<=1.01}
+  function writeBox(){map.setAttribute('viewBox',`${box.x} ${box.y} ${box.w} ${box.h}`);state.zoom=fitWidth/box.w;$('#zoomLabel').textContent=Math.round(state.zoom*100)+'%';$('#zoomIn').disabled=state.zoom>=4.95;$('#zoomOut').disabled=state.zoom<=1.01;queueReadability()}
+  function queueReadability(){cancelAnimationFrame(labelFrame);labelFrame=requestAnimationFrame(updateReadability)}
+  function updateReadability(){
+    const small=matchMedia('(max-width:800px)').matches,unit=canvas.clientWidth/Math.max(1,box.w);
+    // Keep Chinese labels readable at a bounded physical size; English is in the archive.
+    if(state.view!=='castle')for(const el of map.querySelectorAll('.landmark')){
+      const ribbon=el.querySelector('.ribbon')?.parentElement;if(!ribbon)continue;
+      if(!ribbon.dataset.original)ribbon.dataset.original=ribbon.getAttribute('transform')||'';
+      const scale=small?Math.max(1,Math.min(3.2,13/(26*unit))):1;
+      ribbon.setAttribute('transform',`${ribbon.dataset.original} scale(${scale})`);
+      ribbon.classList.add('readable-ribbon');ribbon.style.visibility='visible';
+    }
+    for(const el of map.querySelectorAll('.room-label'))el.style.fontSize=small?`${Math.min(54,Math.max(23,13/unit))}px`:'';
+    // Suppress only colliding/off-screen labels, never the landmark itself or its hit area.
+    if(small&&state.view!=='castle'){
+      const viewport=canvas.getBoundingClientRect(),used=[];
+      const labels=[...map.querySelectorAll('.landmark')].sort((a,b)=>Number(b.dataset.place===state.selected)-Number(a.dataset.place===state.selected));
+      for(const el of labels){const label=el.querySelector('.readable-ribbon');if(!label)continue;const r=label.getBoundingClientRect();
+        const anchor=new DOMPoint(0,0).matrixTransform(el.getScreenCTM()),visible=anchor.x>=viewport.left&&anchor.x<=viewport.right&&r.bottom>viewport.top&&r.top<viewport.bottom;
+        const overlaps=used.some(b=>r.left<b.right+4&&r.right>b.left-4&&r.top<b.bottom+5&&r.bottom>b.top-5);
+        if(!visible||(overlaps&&el.dataset.place!==state.selected))label.style.visibility='hidden';else used.push(r);
+      }
+    }
+    const vr=canvas.getBoundingClientRect();labelObstacles=[...map.querySelectorAll('.readable-ribbon,.room-label')].filter(el=>el.style.visibility!=='hidden').map(el=>{const r=el.getBoundingClientRect();return{x:box.x+(r.left-vr.left)/unit,y:box.y+(r.top-vr.top)/unit,w:r.width/unit,h:r.height/unit}});
+    updatePeople();syncIndexAccess();
+  }
+  function syncIndexAccess(){const small=matchMedia('(max-width:800px)').matches,open=$('#indexPanel').classList.contains('mobile-open');$('#indexPanel').inert=small&&!open;$('#indexBackdrop').hidden=!small||!open;$('#mobileIndex').setAttribute('aria-expanded',String(small&&open))}
+  function setIndex(open,restore=false){$('#indexPanel').classList.toggle('mobile-open',open);syncIndexAccess();if(restore)$('#mobileIndex').focus()}
+  function initialFocus(){const small=canvas.clientWidth<540,c=state.view==='world'?[small?1260:1200,760,small?2.2:1.12]:state.view==='village'?[small?1000:900,small?760:700,small?2:1.1]:[800,610,small?1.55:1.12];focus(...c)}
   function fit(){const ratio=canvas.clientWidth/Math.max(1,canvas.clientHeight);fitWidth=Math.max(base[0],base[1]*ratio);box={x:(base[0]-fitWidth)/2,y:(base[1]-fitWidth/ratio)/2,w:fitWidth,h:fitWidth/ratio};writeBox()}
   function focus(x,y,z=2.2){const ratio=canvas.clientWidth/Math.max(1,canvas.clientHeight),w=fitWidth/z;box={x:x-w/2,y:y-w/ratio/2,w,h:w/ratio};writeBox()}
   function zoom(factor,screenX,screenY){const r=canvas.getBoundingClientRect(),px=screenX==null ? .5 : (screenX-r.left)/r.width,py=screenY==null ? .5 : (screenY-r.top)/r.height;const nextW=Math.max(fitWidth/5,Math.min(fitWidth,box.w*factor));const newH=nextW*box.h/box.w;box.x+=(box.w-nextW)*px;box.y+=(box.h-newH)*py;box.w=nextW;box.h=newH;writeBox()}
   function updateStatus(){const list=state.view==='village'?[]:eras[state.era].people;$('#statusText').textContent=state.view==='village'?'霍格莫德 · 地方志分卷':`${eras[state.era].label} · ${list.length} 组示意足迹`;
-    $('#contextNote').textContent=state.view==='village'?'补充街区图 · 建筑位置为重建 · 村内不显示人物追踪':'拖动漫游 · 滚轮 / 双指缩放 · 人物轨迹为年代示意';
+    $('#contextNote').textContent=state.view==='village'?'补充街区图 · 建筑位置为重建 · 村内不显示人物追踪':state.view==='castle'?'示意人物只沿公共走廊移动 · 不是原著情节回放':'仅沿插画可见小径示意 · 距离与路线非原著测绘';
     $('#tracksToggle').disabled=state.view==='village';$('#pause').disabled=state.view==='village';
   }
   function renderList(){let list=places.filter(p=>state.query||(p.view===state.view&&(p.view!=='castle'||p.floor===state.floor)));const q=state.query.toLocaleLowerCase().trim();if(q)list=list.filter(p=>[p.name,p.en,p.desc,p.story,...p.details,...p.tags||[]].join(' ').toLocaleLowerCase().includes(q));if(state.filter==='secret')list=list.filter(p=>p.secret);if(state.filter==='story')list=list.filter(p=>p.storyFlag);
@@ -23,20 +51,21 @@
   function render(){const m=meta[state.view];base=m.size;$('#sheetTitle').textContent=m.title;$('#sheetSubtitle').textContent=m.sub;$('#sheetNo').textContent=m.sheet;$('#indexTitle').textContent=m.index;$('#indexSubtitle').textContent=m.indexSub;$$('.views button').forEach(b=>b.classList.toggle('chosen',b.dataset.view===state.view));$('#floorStrip').hidden=state.view!=='castle';document.body.classList.toggle('floor-mode',state.view==='castle');
     if(state.view==='world')map.innerHTML=MAPART.illustratedWorld(state.era);else if(state.view==='village')map.innerHTML=MAPART.illustratedVillage(state.era);else{const r=MAPART.floor(state.floor,state.era);map.innerHTML=r.svg;floorBounds=r.bounds;$('#sheetSubtitle').textContent=floors.find(x=>x[0]===state.floor)[1]+' · '+m.sub;}
     installInkEffects();map.setAttribute('aria-label',m.title+'，可拖动缩放，点击建筑查阅档案');map.classList.toggle('tracks-hidden',!state.tracks);$('#routes')?.classList.toggle('hidden',!state.secrets);$$('[data-floor]').forEach(b=>b.classList.toggle('chosen',b.dataset.floor===state.floor));$('#cornerNote').innerHTML=state.view==='village'?'房屋方位为插画重建<br>原著商店名录，点选探索':state.view==='castle'?'空白处不附会房间名称<br>楼层依原著线索与章节索引':'北向与距离为绘图重建<br>点击建筑，展开它的故事';
-    renderList();updateStatus();fit();if(canvas.clientWidth<540){const c=state.view==='world'?[1260,760,2.05]:state.view==='village'?[890,700,1.6]:[800,600,1.45];focus(...c)}else{const c=state.view==='world'?[1200,750,1.12]:state.view==='village'?[900,700,1.1]:[800,600,1.12];focus(...c)}createPeople();highlight();
+    renderList();updateStatus();fit();initialFocus();createPeople();highlight();
   }
   function setView(view){closeDetail();state.view=view;state.query='';state.filter='all';$('#search').value='';$$('[data-filter]').forEach(b=>b.classList.toggle('chosen',b.dataset.filter==='all'));state.selected=null;render()}
   function detailIllustration(p){if(p.view==='castle')return `<svg viewBox="-180 -155 360 205" aria-hidden="true">${MAPART.defs}${MAPART.prop(p.icon)}</svg>`;const world=p.view==='world',w=world?(p.id==='hogwarts'?880:550):440,h=world?350:280;return `<svg viewBox="${p.xy[0]-w/2} ${p.xy[1]-h*.85} ${w} ${h}" aria-hidden="true"><image href="assets/${world?'world':'village'}-engraving.png" x="0" y="0" width="${world?2400:1800}" height="${world?1500:1350}" preserveAspectRatio="none"/></svg>`}
-  function openDetail(p){$('#detailPanel').inert=false;$('#detailPanel').classList.add('open');$('#detailPanel').setAttribute('aria-hidden','false');document.body.classList.add('detail-open');
+  function openDetail(p){if(!$('#detailPanel').classList.contains('open'))returnFocus=document.activeElement;$('#detailPanel').inert=false;$('#detailPanel').classList.add('open');$('#detailPanel').setAttribute('aria-hidden','false');document.body.classList.add('detail-open');
     const label=p.blind?'图外札记 · 原地图盲区':p.view==='village'?'霍格莫德补充地方志':p.secret?'密道与隐藏入口':'地点档案';
     const route=p.secret?`<button class="detail-route" data-route-button="${p.route||p.id}">${p.route==='ariana'?(state.era==='1998'?'查看 1998 年通道附注 →':'这条通道在 1998 年才出现'):p.id==='mirror'&&state.era!=='1976'?'查看坍塌通道 →':'在地图上查看密道 →'}</button>`:'';
     const later=state.era==='1976'?'下述故事是后来发生的回望记录。':state.era==='1993'&&['cave','gladrags','scrivenshaft','puddifoot','hogs-head','prefect-bath','requirement','astronomy','boys-bathroom'].includes(p.id)?'含所选年代之后发生的故事。':'';
     $('#detailContent').innerHTML=`<div class="detail-illustration">${detailIllustration(p)}</div><span class="eyebrow">${p.view==='village'?'HOGSMEADE GAZETTEER':p.view==='castle'?'HOGWARTS · '+floors.find(x=>x[0]===p.floor)?.[2]:'HOGWARTS & ENVIRONS'}</span><h2>${p.name}</h2><div class="detail-en">${p.en}</div><span class="detail-type">${label}</span><p class="detail-description">${p.desc}</p><div class="detail-section"><h3>纸边批注</h3><ul>${p.details.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="detail-section"><h3>${state.era} · 年代状态</h3><p>${ATLAS.state(p,state.era)}</p></div><div class="detail-section"><h3>留在这里的故事</h3>${later?`<p class="detail-note">${later}</p>`:''}<p>${p.story}</p></div>${p.tags?`<div class="detail-section"><div class="detail-facts">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div></div>`:''}${p.action?`<button class="detail-route" data-detail-view="${p.action}">${p.actionLabel}</button>`:route}<div class="detail-source">原著 / 资料依据<br>${p.book}<br><a href="${p.source}" target="_blank" rel="noopener noreferrer">${p.source.includes('hp-lexicon')?'核对章节索引 · Harry Potter Lexicon':'查阅官方相关资料'} ↗</a></div><p class="detail-note">地点资料不等同于精确测绘；建筑样貌、比例与相邻坐标是本图册的插画重建。</p>`;
-    $('#detailPanel').scrollTop=0;
+    const provenance=document.createElement('div');provenance.className='detail-evidence';provenance.innerHTML=`<strong>资料边界</strong><span>原著线索：见下方作品 / 章节</span><span>绘图重建：建筑样貌、位置、比例与行走路线</span>${p.blind?'<span>地图盲区：不显示屋内人物</span>':''}`;$('#detailContent').querySelector('.detail-type').after(provenance);
+    $('#detailPanel').scrollTop=0;queueReadability();
   }
-  function closeDetail(){if($('#detailPanel').contains(document.activeElement))document.activeElement.blur();$('#detailPanel').classList.remove('open');$('#detailPanel').setAttribute('aria-hidden','true');$('#detailPanel').inert=true;document.body.classList.remove('detail-open')}
+  function closeDetail(restore=false){if($('#detailPanel').contains(document.activeElement))document.activeElement.blur();$('#detailPanel').classList.remove('open');$('#detailPanel').setAttribute('aria-hidden','true');$('#detailPanel').inert=true;document.body.classList.remove('detail-open');if(restore){const target=returnFocus?.isConnected&&!returnFocus.closest('[inert]')?returnFocus:map.querySelector(`[data-place="${state.selected}"]`)||$('#mobileIndex');target.focus()}queueReadability()}
   function selectPlace(id){const p=places.find(p=>p.id===id);if(!p)return;state.selected=id;if(state.view!==p.view||p.floor&&state.floor!==p.floor){state.view=p.view;if(p.floor)state.floor=p.floor;render()}
-    openDetail(p);renderList();highlight();$('#indexPanel').classList.remove('mobile-open');requestAnimationFrame(()=>{const b=state.view==='castle'?floorBounds.find(x=>x.id===p.id):null;focus(b?.x??p.xy[0],b?.y??p.xy[1],state.view==='world'?2.4:state.view==='village'?2.1:1.75)});
+    openDetail(p);renderList();highlight();setIndex(false);$('#detailClose').focus();requestAnimationFrame(()=>{const b=state.view==='castle'?floorBounds.find(x=>x.id===p.id):null;focus(b?.x??p.xy[0],b?.y??p.xy[1],state.view==='world'?2.8:state.view==='village'?2.6:2.5)});
   }
   function highlight(){$$('.landmark').forEach(el=>el.classList.toggle('selected',el.dataset.place===state.selected));$$('.map-room').forEach(el=>el.classList.toggle('room-selected',el.dataset.room===state.selected))}
   function routeAction(route){if(route==='ariana'&&state.era!=='1998'){toast('这条通道属于1998年的故事。\n切换到1998年，可以查看附加札记。');return}
@@ -75,22 +104,25 @@
     $('#inkThreshold').setAttribute('intercept',String(-18+19*amount));
     if(progress===1){if(inkTransition.opening)$('#inkArtwork').removeAttribute('mask');inkTransition=null}
   }
-  function createPeople(){people=[];const holder=$('#people');if(!holder)return;let routes;
-    if(state.view==='world')routes=[[[1214,842],[1216,680],[1185,530],[1100,340]],[[1370,821],[1570,820],[1790,810],[1990,790]],[[1372,801],[1458,692],[1535,500],[1550,365]],[[900,550],[1030,620],[1150,729],[1273,790]]];
-    else routes=[[[337,615],[604,615],[790,615],[1208,615]],[[1217,635],[1028,635],[808,635],[515,635]],[[790,857],[790,714],[790,620],[790,413]],[[790,355],[790,585],[550,615],[337,615]]];
+  const personNames={'James Potter':'詹姆·波特','Sirius Black':'小天狼星','Remus Lupin':'卢平','Peter Pettigrew':'彼得·佩迪鲁','Harry Potter':'哈利·波特','Hermione Granger':'赫敏·格兰杰','Argus Filch':'费尔奇','Neville Longbottom':'纳威·隆巴顿','Ginny Weasley':'金妮·韦斯莱','Luna Lovegood':'卢娜·洛夫古德','Severus Snape':'西弗勒斯·斯内普'};
+  function createPeople(){people=[];const holder=$('#people');if(!holder)return;const artwork=$('#inkArtwork'),firstLandmark=artwork.querySelector('.landmark');if(firstLandmark?.parentNode===artwork)artwork.insertBefore(holder,firstLandmark);const routes=state.view==='world'?MAPART.groundsPatrols:MAPART.floorPlan.patrols;
     eras[state.era].people.forEach((name,i)=>{
       const g=document.createElementNS(svgNS,'g');g.setAttribute('class','person');
-      const width=Math.max(92,name.length*15+24),speed=state.view==='world'?24:26,spacing=state.view==='world'?14:12,pool=Math.ceil(footprintLife*speed/spacing)+2;
-      g.innerHTML=`<g class="foot-trail" aria-hidden="true">${Array.from({length:pool},()=>`<g class="foot-stamp" visibility="hidden"><path class="foot" d="${footPath}"/></g>`).join('')}</g><g class="name-tag" aria-hidden="true"><path class="scroll-tail" d="M-4-12-17-15-13-7-17 0-3-3M${width+3}-12l14-3-4 8 4 7-15-3"/><path class="name-scroll" d="M0-17Q${width/2}-21 ${width}-17L${width} 3Q${width/2}-1 0 3Z"/><path class="scroll-crease" d="M4-16v17M${width-4}-16v17"/><text x="${width/2}" y="-3" text-anchor="middle">${name}</text></g>`;
-      holder.append(g);const route=routes[i],lengths=route.slice(1).map((p,j)=>Math.hypot(p[0]-route[j][0],p[1]-route[j][1]));
-      people.push({g,name,route,lengths,total:lengths.reduce((a,b)=>a+b,0),offset:i*.22,speed,spacing,scale:state.view==='world'?1:.9,label:g.querySelector('.name-tag'),stamps:[...g.querySelectorAll('.foot-stamp')].map(el=>({el,ink:el.firstElementChild,step:null,wear:null}))});
+      const label=personNames[name]||name,width=Math.max(82,label.length*14+20),speed=state.view==='world'?12:26,spacing=state.view==='world'?14:12,pool=Math.ceil(footprintLife*speed/spacing)+2;
+      g.innerHTML=`<title>${label} · ${name} · 示意轨迹</title><g class="foot-trail" aria-hidden="true">${Array.from({length:pool},()=>`<g class="foot-stamp" visibility="hidden"><path class="foot" d="${footPath}"/></g>`).join('')}</g><g class="name-tag" aria-hidden="true"><path class="scroll-tail" d="M-4-12-17-15-13-7-17 0-3-3M${width+3}-12l14-3-4 8 4 7-15-3"/><path class="name-scroll" d="M0-17Q${width/2}-21 ${width}-17L${width} 3Q${width/2}-1 0 3Z"/><path class="scroll-crease" d="M4-16v17M${width-4}-16v17"/><text x="${width/2}" y="-3" text-anchor="middle">${label}</text></g>`;
+      holder.append(g);const route=routes[i%routes.length],lengths=route.slice(1).map((p,j)=>Math.hypot(p[0]-route[j][0],p[1]-route[j][1]));
+      people.push({g,name,width,route,lengths,total:lengths.reduce((a,b)=>a+b,0),offset:i*.22,speed,spacing,scale:state.view==='world'?1:.9,label:g.querySelector('.name-tag'),stamps:[...g.querySelectorAll('.foot-stamp')].map(el=>({el,ink:el.firstElementChild,step:null,wear:null}))});
     });
     updatePeople();
   }
   function pointOn(p,dist){const cycle=((dist%(p.total*2))+p.total*2)%(p.total*2),back=cycle>p.total,d=back?p.total*2-cycle:cycle;let prev=0;for(let i=0;i<p.lengths.length;i++){if(d<=prev+p.lengths[i]){const t=(d-prev)/p.lengths[i],a=p.route[i],b=p.route[i+1];return{x:a[0]+(b[0]-a[0])*t,y:a[1]+(b[1]-a[1])*t,a:Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI+90+(back?180:0)}}prev+=p.lengths[i]}return {x:p.route[0][0],y:p.route[0][1],a:0}}
-  function updatePeople(){for(const p of people){
+  function updatePeople(){const occupied=[...labelObstacles],unit=canvas.clientWidth/Math.max(1,box.w),small=canvas.clientWidth<540;for(const p of people){
     const dist=simTime*p.speed+p.offset*p.total,point=pointOn(p,dist),newest=Math.floor(dist/p.spacing);
-    p.label.setAttribute('transform',`translate(${point.x+20} ${point.y-18}) scale(${p.scale})`);
+    const scale=Math.max(p.scale,(small?1.02:.84)/Math.max(.01,unit)),w=(p.width+34)*scale,h=28*scale;
+    const visible=point.x>=box.x&&point.x<=box.x+box.w&&point.y>=box.y&&point.y<=box.y+box.h;
+    const candidates=[[point.x+14*scale,point.y-18*scale],[point.x+14*scale,point.y+40*scale],[point.x-w,point.y-18*scale],[point.x-w,point.y+40*scale]];
+    let chosen=null;for(const [cx,cy] of candidates){const x=Math.max(box.x+17*scale,Math.min(box.x+box.w-w,cx)),y=Math.max(box.y+23*scale,Math.min(box.y+box.h-8*scale,cy)),r={x,y:y-23*scale,w,h};if(!occupied.some(b=>r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y)){chosen={x,y,r};break}}
+    p.label.style.visibility=visible&&chosen?'visible':'hidden';if(visible&&chosen){occupied.push(chosen.r);p.label.setAttribute('transform',`translate(${chosen.x} ${chosen.y}) scale(${scale})`)}
     p.stamps.forEach((stamp,j)=>{
       const step=newest-j,age=(dist-step*p.spacing)/p.speed;
       if(step<0||age>=footprintLife){stamp.el.setAttribute('visibility','hidden');return}
@@ -104,17 +136,17 @@
   }}
   function animate(t){if(!lastFrame)lastFrame=t;const delta=Math.min((t-lastFrame)/1000,.1);lastFrame=t;updateInk(t);if(state.active&&!state.paused&&!reduced&&!document.hidden){simTime+=delta;updatePeople()}animationFrame=requestAnimationFrame(animate)}
   function setAwakeAccess(awake){for(const el of [$('.masthead'),$('.workspace'),$('.statusbar')])el.inert=!awake;$('#coverScreen').inert=awake;$('#coverScreen').setAttribute('aria-hidden',String(awake))}
-  function wake(){if(state.active)return;clearTimeout(wakeTimer);document.body.classList.remove('sleeping','closing');document.body.classList.add('awake','waking');state.active=true;setAwakeAccess(true);transitionInk(true);requestAnimationFrame(()=>{fit();const small=canvas.clientWidth<540;const c=state.view==='world'?[small?1260:1200,760,small?2.05:1.12]:state.view==='village'?[890,700,small?1.6:1.1]:[800,600,small?1.45:1.12];focus(...c)});wakeTimer=setTimeout(()=>{document.body.classList.remove('waking');$('#activate').blur()},reduced?0:2550)}
+  function wake(){if(state.active)return;clearTimeout(wakeTimer);document.body.classList.remove('sleeping','closing');document.body.classList.add('awake','waking');state.active=true;setAwakeAccess(true);transitionInk(true);requestAnimationFrame(()=>{fit();initialFocus()});wakeTimer=setTimeout(()=>{document.body.classList.remove('waking');$('#activate').blur()},reduced?0:2550)}
   function sleep(){if(!state.active)return;clearTimeout(wakeTimer);closeDetail();state.active=false;document.body.classList.remove('waking');document.body.classList.add('closing');transitionInk(false);wakeTimer=setTimeout(()=>{document.body.classList.remove('awake','closing');document.body.classList.add('sleeping');setAwakeAccess(false);$('#activate').focus()},reduced?0:1150)}
-  $('#activate').onclick=wake;$('#sleep').onclick=sleep;
+  $('#activate').onclick=wake;$('#sleep').onclick=sleep;$('#mobileIndex').textContent='目录';$('#mobileIndex').setAttribute('aria-controls','indexPanel');
   $('.brand').onclick=e=>{e.preventDefault();setView('world')};$$('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));$('#era').onchange=e=>{state.era=e.target.value;const p=places.find(p=>p.id===state.selected);render();if(p)openDetail(p);toast(`已翻到 ${e.target.selectedOptions[0].textContent}\n人物为该年代的示意轨迹。`)};
   $('#floorStrip').innerHTML=floors.map(f=>`<button data-floor="${f[0]}" class="${f[0]===state.floor?'chosen':''}">${f[1]}</button>`).join('');$('#floorStrip').onclick=e=>{const b=e.target.closest('[data-floor]');if(!b)return;state.floor=b.dataset.floor;state.selected=null;closeDetail();render()};
   $('#placeList').onclick=e=>{const b=e.target.closest('[data-index-place]');if(b)selectPlace(b.dataset.indexPlace)};
   canvas.onclick=e=>{if(dragged)return;const b=e.target.closest('[data-place]');if(b)selectPlace(b.dataset.place)};
   canvas.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){const b=e.target.closest('[data-place]');if(b){e.preventDefault();selectPlace(b.dataset.place)}}};
-  $('#detailClose').onclick=closeDetail;$('#detailContent').onclick=e=>{const route=e.target.closest('[data-route-button]');const view=e.target.closest('[data-detail-view]');if(route)routeAction(route.dataset.routeButton);if(view)setView(view.dataset.detailView)};
+  $('#detailClose').onclick=()=>closeDetail(true);$('#detailContent').onclick=e=>{const route=e.target.closest('[data-route-button]');const view=e.target.closest('[data-detail-view]');if(route)routeAction(route.dataset.routeButton);if(view)setView(view.dataset.detailView)};
   $('#search').oninput=e=>{state.query=e.target.value;renderList()};$$('[data-filter]').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;$$('[data-filter]').forEach(x=>x.classList.toggle('chosen',x===b));renderList()});
-  $('#mobileIndex').onclick=()=>$('#indexPanel').classList.toggle('mobile-open');$('#indexClose').onclick=()=>$('#indexPanel').classList.remove('mobile-open');
+  $('#mobileIndex').onclick=()=>{const open=!$('#indexPanel').classList.contains('mobile-open');if(open){closeDetail();setIndex(true);$('#search').focus()}else setIndex(false,true)};$('#indexClose').onclick=()=>setIndex(false,true);$('#indexBackdrop').onclick=()=>setIndex(false,true);
   $('#zoomIn').onclick=()=>zoom(.75);$('#zoomOut').onclick=()=>zoom(1.35);$('#reset').onclick=()=>{fit();toast('已回到本卷全图')};
   $('#secretsToggle').onclick=()=>{state.secrets=!state.secrets;$('#routes')?.classList.toggle('hidden',!state.secrets);$('#secretsToggle').setAttribute('aria-pressed',String(state.secrets));$('#secretsToggle').textContent='密道 '+(state.secrets?'开':'关')};
   $('#tracksToggle').onclick=()=>{state.tracks=!state.tracks;map.classList.toggle('tracks-hidden',!state.tracks);$('#tracksToggle').setAttribute('aria-pressed',String(state.tracks));$('#tracksToggle').textContent='足迹 '+(state.tracks?'开':'关')};
@@ -128,8 +160,8 @@
   canvas.addEventListener('pointerdown',e=>{if(e.button&&e.button!==0)return;dragged=false;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});startPoint={x:e.clientX,y:e.clientY};if(pointers.size===2){const a=[...pointers.values()];pinchDistance=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
   canvas.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const prev=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const a=[...pointers.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(pinchDistance&&d>0)zoom(pinchDistance/d,(a[0].x+a[1].x)/2,(a[0].y+a[1].y)/2);pinchDistance=d;dragged=true;return}if(startPoint&&Math.hypot(e.clientX-startPoint.x,e.clientY-startPoint.y)>5)dragged=true;if(dragged){canvas.setPointerCapture(e.pointerId);const r=canvas.getBoundingClientRect();box.x-=(e.clientX-prev.x)*box.w/r.width;box.y-=(e.clientY-prev.y)*box.h/r.height;const pad=base[0]*.25;box.x=Math.max(-box.w+pad,Math.min(base[0]-pad,box.x));box.y=Math.max(-box.h+pad,Math.min(base[1]-pad,box.y));writeBox()}});
   const release=e=>{pointers.delete(e.pointerId);pinchDistance=null;startPoint=null;setTimeout(()=>{dragged=false},50)};canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);
-  document.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea'))return;if(e.key==='Escape'){if($('#notesDialog').open)return;if($('#detailPanel').classList.contains('open'))closeDetail();else if($('#indexPanel').classList.contains('mobile-open'))$('#indexPanel').classList.remove('mobile-open');else if(state.active)sleep();return}if(e.key==='/'){e.preventDefault();if(!state.active)wake();$('#indexPanel').classList.add('mobile-open');$('#search').focus()}if(!state.active&&e.key==='Enter')wake();if(state.active){if(e.key==='+')zoom(.8);if(e.key==='-')zoom(1.25);if(e.key==='0')fit()}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#notesDialog').open)return;if($('#indexPanel').classList.contains('mobile-open'))setIndex(false,true);else if($('#detailPanel').classList.contains('open'))closeDetail(true);else if(state.active)sleep();return}if(e.target.matches('input,select,textarea'))return;if(e.key==='/'){e.preventDefault();if(!state.active)wake();closeDetail();setIndex(true);$('#search').focus()}if(!state.active&&e.key==='Enter')wake();if(state.active){if(e.key==='+')zoom(.8);if(e.key==='-')zoom(1.25);if(e.key==='0')fit()}});
   let resizeTimer;new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{const cx=box.x+box.w/2,cy=box.y+box.h/2,z=state.zoom;fit();if(z>1.05)focus(cx,cy,z)},100)}).observe(canvas);
   render();setAwakeAccess(false);animationFrame=requestAnimationFrame(animate);
-  window.addEventListener('pagehide',()=>cancelAnimationFrame(animationFrame));
+  window.addEventListener('pagehide',()=>{cancelAnimationFrame(animationFrame);cancelAnimationFrame(labelFrame)});
 })();
