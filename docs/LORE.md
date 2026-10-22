@@ -14,7 +14,7 @@
 - 独眼女巫通向蜂蜜公爵地窖，开启词为 Dissendium。
 - 打人柳下通道通向尖叫棚屋；离开校域地图边缘后，不显示棚屋内的人物位置。
 - 双胞胎介绍过七条出校路线，费尔奇知道其中四条。未详述路线不编造出口。
-- 四楼镜后通道在1993—94年已坍塌；更早年代的显示按坍塌前状态作示意。
+- 四楼镜后通道在1993—94年已坍塌；更早年代按坍塌前状态作推定示意，不证明1976年可通行。未确认1998年曾修复，不编造出口。
 - 阿利安娜肖像后的通道属于1998年情节，不混入1993年。
 - 有求必应屋属于原地图盲区，以图外札记展示；密室不作为原图已知房间绘制。
 - 原著西塔猫头鹰棚屋与电影后期独立塔楼有区别。
@@ -33,5 +33,7 @@
 - [官方：隐藏空间](https://www.harrypotter.com/features/the-camouflaged-corners-and-secret-spaces-of-hogwarts)
 - [J.K. Rowling：大湖](https://www.harrypotter.com/writing-by-jk-rowling/the-great-lake)
 - [官方：有求必应屋](https://www.harrypotter.com/fact-file/locations/the-room-of-requirement)
+- [官方：图书馆](https://www.harrypotter.com/fact-file/locations/the-hogwarts-library)
+- [官方：禁书区](https://www.harrypotter.com/fact-file/locations/the-restricted-section)
 - [Lexicon：霍格莫德章节索引](https://www.hp-lexicon.org/place/great-britain-united-kingdom/scotland/hogsmeade/)
 - [Lexicon：六楼男生盥洗室](https://www.hp-lexicon.org/place/sixth-floor-boys-bathroom/)

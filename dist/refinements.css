@@ -68,3 +68,10 @@ html{overflow:hidden}.workspace{overflow:hidden}.detail-toolbar>span{display:non
   .passage-trail{bottom:76px;left:14px;right:14px;padding:12px 13px;max-width:none}.passage-trail h3{font-size:19px;margin:5px 30px 8px 0}.passage-trail .eyebrow{font-size:8px}.passage-ends{gap:5px}.passage-ends button{font-size:13px;min-height:48px;padding:7px 5px}.passage-trail p{font-size:10px;margin-top:8px}.passage-open .canvas{top:16px;bottom:255px}.passage-open .map-legend,.passage-open .map-title,.passage-open .floor-strip{display:none}
 }
 @media(max-width:800px) and (max-height:680px){.passage-trail p{font-size:9px;line-height:1.6;margin-top:5px}.passage-trail{padding-top:8px;padding-bottom:8px}.passage-trail .eyebrow{display:none}.passage-trail h3{font-size:16px}.passage-open .canvas{top:16px;bottom:230px}}
+/* Quiet library details and an evidence-aware comparison, not a playable tunnel. */
+.workspace,.map-stage,.canvas{overflow:clip}
+.floor-feature-label{font:14px var(--serif);fill:#70513a;text-anchor:middle;paint-order:stroke;stroke:#ded4bc;stroke-width:3px;stroke-linejoin:round}
+.route.historic{opacity:.45;stroke-dasharray:4 9}.route.blocked.active-route,.route.historic.active-route{animation:none}.rubble{pointer-events:none}
+.era-compare{display:flex;gap:8px}.era-compare button{flex:1;min-width:0;min-height:48px;padding:8px 6px;border:1px solid #8b705677;background:#d7c6a633;font:12px/1.55 var(--serif);color:#695039;cursor:pointer}
+.era-compare button[aria-pressed="true"]{background:#a8874c33;box-shadow:inset 0 0 0 1px #8b7056;color:#513721}.era-compare button:hover{background:#b49b6f33}.mirror-comparison>p{border-left:2px solid #9c835c;padding-left:9px}
+@media(max-width:800px){.era-compare button{font-size:13px}.mirror-comparison h3{font-size:19px}}

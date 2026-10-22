@@ -138,7 +138,15 @@ window.MAPART = (() => {
       [[1292,888],[1292,600],[850,600]],[[610,330],[610,590],[350,590]]]
   };
   thirdPlan.cells=thirdPlan.rooms.map(room=>room.rect);
-  const planFor=f=>f==='third'?thirdPlan:floorPlan;
+  const fourthPlan={
+    corridors:[[230,900,1180,70],[975,280,80,690],[915,650,140,80],[1055,450,75,70]],
+    rooms:[{id:'library',rect:[245,300,670,560],door:[915,650,915,730]},
+      {id:'mirror',rect:[1130,300,250,260],door:[1130,450,1130,520]}],
+    patrols:[[[260,925],[1010,925],[1010,320]],[[1370,946],[1035,946],[1035,335]],
+      [[993,340],[993,920],[440,920]],[[1030,850],[1030,680],[940,680]]]
+  };
+  fourthPlan.cells=fourthPlan.rooms.map(room=>room.rect);
+  const planFor=f=>f==='third'?thirdPlan:f==='fourth'?fourthPlan:floorPlan;
   function thirdFloor(){let o=defs,bounds=[];
     o+=path('M225 300H650V235H1235V275H1390V955H1245V930H835V990H220V690H180V510H225Z','shade');
     // One continuous outline, without false walls through corridor intersections.
@@ -164,13 +172,48 @@ window.MAPART = (() => {
     o+=text(205,213,'通往蜂蜜公爵地窖 ↗','clue-label')+text(800,1040,'连接关系有原著依据 · 翼廊、门位与路径曲折为导览重建','small-label');
     return {svg:o+'<g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:thirdPlan};
   }
+  function libraryInterior(x,y,w,h){let o='';
+    const shelf=(sx,sy,sw)=>{let q=rect(sx,sy,sw,25,'shade');for(let j=8;j<sw-5;j+=9)q+=line(sx+j,sy+3,sx+j+(j%3),sy+22,'ink hair');return q};
+    // The rope, books and permission rule are sourced; their drawn positions are not.
+    o+=rect(x+22,y+22,w-44,154,'wash');
+    for(let row=0;row<2;row++)for(let col=0;col<4;col++)o+=shelf(x+38+col*150,y+36+row*42,132);
+    o+=text(x+w/2,y+146,'禁书区 · 教师书面许可','floor-feature-label');
+    for(const sx of [x+27,x+w/2,x+w-27])o+=circle(sx,y+181,4)+line(sx,y+177,sx,y+194,'ink hair');
+    o+=path(`M${x+27} ${y+181}q${w/4-14} 17 ${w/2-27} 0q${w/4-14} 17 ${w/2-27} 0`,'ink hair');
+    for(let row=0;row<2;row++)for(let col=0;col<4;col++)o+=shelf(x+42+col*149,y+235+row*65,122);
+    for(let col=0;col<3;col++){const sx=x+58+col*196,sy=y+405;o+=rect(sx,sy,146,57,'wash','rx="4"');for(const dy of [-12,63])for(const dx of [18,92])o+=rect(sx+dx,sy+dy,30,6,'ink hair');o+=path(`M${sx+48} ${sy+17}q12 -5 24 0q12 -5 24 0v22q-12 -5 -24 0q-12 -5 -24 0ZM${sx+72} ${sy+17}v22`,'ink hair')}
+    o+=text(x+w/2,y+493,'阅览区 · 请勿带入食物','small-label');return o;
+  }
+  function fourthFloor(era){const earlier=era==='1976';let o=defs,bounds=[];
+    o+=path('M220 275H940V250H1080V275H1405V590H1080V875H1435V995H205V880H220Z','shade');
+    o+=path('M975 280H1055V450H1130V520H1055V900H1410V970H230V900H975V730H915V650H975Z','wash');
+    o+=text(800,172,'FOURTH FLOOR','region-title')+text(800,209,'四楼 · 书页深处与镜后旧路','third-subtitle');
+    for(const room of fourthPlan.rooms){const p=places.find(p=>p.id===room.id),[x,y,w,h]=room.rect,cx=x+w/2;
+      bounds.push({id:p.id,x:cx,y:y+h/2,w,h});
+      o+=`<g class="landmark" tabindex="0" role="button" data-place="${p.id}" aria-label="${p.name}，查看档案">${rect(x,y,w,h,'map-room',`data-room="${p.id}"`)}${rect(x+10,y+10,w-20,h-20,'ink hair')}`;
+      if(p.id==='library')o+=libraryInterior(x,y,w,h);
+      else{o+=rect(cx-43,y+25,86,128,'shade')+rect(cx-32,y+37,64,103,'wash')+path(`M${cx-24} ${y+117}l45 -65m-34 72l35 -50`,'ink hair')+path(`M${cx-53} ${y+24}q53 -32 106 0M${cx-38} ${y+156}v17m76 -17v17`,'ink hair');o+=text(cx,y+202,earlier?'较早年代 · 推定示意':'旧路已坍塌','floor-feature-label')}
+      o+=text(cx,y+h-28,p.name,'room-label',p.id==='library'?'style="font-size:30px"':'')+text(cx,y+h-10,p.en,'room-en')+'</g>';
+      const [ax,ay,bx,by]=room.door;o+=path(`M${ax} ${ay}L${bx} ${by}`,'door-opening')+path(`M${ax} ${ay}h-40q0 40 40 40`,'ink hair');
+      if(p.id==='library')for(let j=0;j<8;j++)o+=rect(x+35+j*77,y-6,25,12,'wash');
+    }
+    o+=text(1110,1004,'PUBLIC GALLERY','small-label');
+    for(let j=0;j<17;j++)for(const y of [903,963])o+=rect(260+j*66,y,5,4,'ink hair');
+    o+=circle(1015,263,30,'wash');for(let j=0;j<6;j++)o+=line(995+j*2,250+j*5,1035-j*2,250+j*5,'ink hair');
+    o+=`<g id="routes" class="routes">${path('M1255 332V245H1460',earlier?'route historic':'route blocked','data-route="mirror"')}`;
+    if(!earlier){o+=`<g class="rubble" aria-hidden="true">`;for(const [x,y,r] of [[1322,242,12],[1336,254,10],[1311,256,9],[1338,235,8]])o+=path(`M${x-r} ${y}l${r*.6} ${-r} ${r} 2 ${r*.4} ${r} ${-r} ${r*.6}Z`,'shade');o+=path('M1311 226l32 35m-30 -1l29 -33','ink')+'</g>'}
+    o+='</g>'+text(1460,224,'? 出口未详','small-label');
+    o+=`<g class="passage-clue" tabindex="0" role="button" data-route-trigger="mirror" data-clue-x="1255" data-clue-y="616" aria-label="对照镜后旧密道的年代状态">${rect(1165,572,180,88,'clue-hit')}${text(1255,616,'对照年代 ↗','clue-label')}</g>`;
+    o+=text(800,1040,'同层收录不表示相邻 · 书架、门位、距离与走廊为导览重建','small-label');
+    return {svg:o+'<g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:fourthPlan};
+  }
   // Short sections traced against visible paths in our own grounds illustration.
   // Do not extrapolate paths behind perspective buildings, into the lake or village.
   const groundsPatrols=[
     [[1115,291],[1095,303],[1107,317],[1142,327],[1170,334]],
     [[826,688],[815,710],[804,738],[809,759],[830,777],[866,792],[906,816]]
   ];
-  function floor(f,era){if(f==='third')return thirdFloor();let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
+  function floor(f,era){if(f==='third')return thirdFloor();if(f==='fourth')return fourthFloor(era);let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
     o+=path('M185 214H1415V952H185ZM207 235H1392V930H207Z','shade','fill-rule="evenodd"');
     for(const c of floorPlan.corridors)o+=rect(...c,'wash');
     for(const [x,y] of [[205,242],[1395,242],[205,930],[1395,930]]){o+=circle(x,y,71,'shade')+circle(x,y,55,'ink');for(let i=0;i<18;i++){let a=i*Math.PI/9;o+=line(x+Math.cos(a)*20,y+Math.sin(a)*20,x+Math.cos(a)*53,y+Math.sin(a)*53,'ink hair')}o+=circle(x,y,19)}
@@ -184,8 +227,6 @@ window.MAPART = (() => {
     for(let i=0;i<16;i++)for(const y of [591,639])o+=rect(330+i*63,y,5,4,'ink hair');o+=text(1140,680,'CORRIDOR','small-label')+text(735,871,'旋转楼梯','small-label','transform="rotate(-90 735 871)"');
     o+=`<g transform="translate(800 614)">${circle(0,0,36)}${path('M-24 -5h48m-45 7h42m-36 7h30m-25 7h20','ink hair')}</g>`;
     o+=`<g id="routes" class="routes">`;
-    if(f==='third')o+=path('M1085 537V617H490V700','route','data-route="tapestry"')+path('M490 300Q483 221 388 181T140 155','route','data-route="witch-honey"');
-    if(f==='fourth')o+=path('M1085 300Q1040 227 1300 181T1470 164',era==='1976'?'route':'route blocked','data-route="mirror"')+text(1260,209,era==='1976'?'旧密道 · 终点未明':'× 已坍塌','small-label');
     if(f==='seventh'&&era==='1998')o+=path('M1090 300Q1191 188 1450 177','route supplement','data-route="ariana"')+text(1305,146,'1998 年附加札记','small-label');
     o+=`</g><g id="people"></g><g id="selectedOverlay"></g>`;return {svg:o,bounds,plan:floorPlan};
   }

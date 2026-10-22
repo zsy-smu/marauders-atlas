@@ -27,7 +27,22 @@ for (const [floor] of context.ATLAS.floors) for (const era of ['1976', '1993', '
       samples++;
     }
   }
-  if (floor === 'fourth') assert(svg.includes('M1085 300'), 'Mirror route must start in the mirror cell, not the library');
+  if (floor === 'fourth') {
+    assert.notEqual(plan, art.floorPlan, 'Fourth floor must not use the generic four-cell plan');
+    assert.notEqual(plan, art.planFor('third'), 'Fourth floor must differ from the third-floor pilot');
+    assert.equal(plan.rooms.length, 2);
+    for (const room of plan.rooms) {
+      const b = art.floor(floor, era).bounds.find(b => b.id === room.id), [x, y, w, h] = room.rect;
+      assert.equal(b.x, x + w / 2); assert.equal(b.y, y + h / 2);
+      assert.equal(b.w, w); assert.equal(b.h, h);
+    }
+    assert(svg.includes('M1255 332V245H1460'), 'Mirror route begins behind the actual mirror, not in the library');
+    assert.equal(svg.includes('class="rubble"'), era !== '1976', 'Rubble is visible in the known collapsed state');
+    assert.equal(svg.includes('route historic'), era === '1976', 'The earlier state is explicitly conjectural');
+    assert(svg.includes('data-route-trigger="mirror"'));
+    assert(svg.includes('禁书区 · 教师书面许可'));
+    assert(svg.includes('同层收录不表示相邻'));
+  }
   if (floor === 'third') {
     assert.notEqual(plan, art.floorPlan, 'Third floor must not fall back to the shared guide grid');
     assert.equal(plan.rooms.length, 4);
@@ -59,4 +74,9 @@ for (const c of context.ATLAS.connections) {
 const app = readFileSync(new URL('../dist/app.js', import.meta.url), 'utf8');
 assert(app.includes('currentFloorPlan=r.plan'), 'Retain the plan used by the rendered floor');
 assert(app.includes(':currentFloorPlan.patrols'), 'Animate on that floor, not the default shared grid');
-console.log(`OK: ${samples} floor-route samples across 10 floors × 3 eras, including both-shoe clearance; independent third-floor geometry, connection endpoints and matching patrol selection; village tracking excluded. Grounds traces require visual review, not blueprint proof.`);
+const mirror = context.ATLAS.places.find(p => p.id === 'mirror');
+assert(context.ATLAS.state(mirror, '1976').includes('未确认'), 'Do not claim the tunnel was confirmed usable in 1976');
+assert(context.ATLAS.state(mirror, '1993').includes('已坍塌'));
+assert(context.ATLAS.state(mirror, '1998').includes('修复'));
+assert.equal(context.ATLAS.places.find(p => p.id === 'library').evidence.length, 2);
+console.log(`OK: ${samples} floor-route samples across 10 floors × 3 eras, including both-shoe clearance; independent third/fourth-floor plans, archive endpoints and matching patrols; mirror inference/collapse states; village tracking excluded. Grounds traces require visual review, not blueprint proof.`);
