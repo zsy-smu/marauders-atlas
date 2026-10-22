@@ -2,6 +2,8 @@
 
 仓库：[zsy-smu / marauders-atlas](https://github.com/zsy-smu/marauders-atlas)。下面是可以自行修改、使用的介绍，没有代发到其他平台。
 
+在线体验：[打开活点地图](https://zsy-smu.github.io/marauders-atlas/)，无需登录。
+
 ## 中文介绍
 
 做了一张中文活点地图，用原生 JavaScript 和 SVG 写的。
@@ -26,7 +28,7 @@ The map uses aged-paper illustrations, an ink reveal and footprints that stay wh
 
 Topics：`harry-potter`、`marauders-map`、`hogwarts`、`hogsmeade`、`interactive-map`、`vanilla-javascript`、`svg`、`fan-project`。
 
-公开 Demo 尚未确认可用，不要把受限托管地址写成免登录体验入口。
+Website 可填写公开 Demo：<https://zsy-smu.github.io/marauders-atlas/>。原托管站的访问权限没有改变。
 
 ## 配图与标题
 

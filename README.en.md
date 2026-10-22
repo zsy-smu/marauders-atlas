@@ -2,6 +2,8 @@
 
 # Marauder’s Atlas · 活点地图
 
+### [🗺️ Open the live map →](https://zsy-smu.github.io/marauders-atlas/)
+
 An interactive Hogwarts map with location records, illustrated floor plans and moving footprints. An unofficial fan project built with vanilla JavaScript and SVG. **The app interface and records are in Chinese.**
 
 [简体中文](README.md) · [Download source](https://github.com/zsy-smu/marauders-atlas/archive/refs/heads/main.zip) · [Run locally](#run-locally)
@@ -10,7 +12,7 @@ An interactive Hogwarts map with location records, illustrated floor plans and m
 
 **3 map volumes / 50 location records / 10 floor groups / 3 eras**
 
-There is currently no confirmed unrestricted public demo. The [hosted version](https://marauders-map-cn.zsiyuan202.chatgpt.site/) has access restrictions; the source runs independently.
+The live demo needs no sign-in. You can also download the source and run it locally.
 
 ## Things to try
 

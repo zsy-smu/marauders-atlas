@@ -2,6 +2,8 @@
 
 # 活点地图 · Marauder’s Atlas
 
+### [🗺️ 在线体验活点地图 →](https://zsy-smu.github.io/marauders-atlas/)
+
 一张可以缩放、翻阅地点档案、观察人物脚印的霍格沃茨地图。中文界面，非官方同人项目，用原生 JavaScript 和 SVG 制作。
 
 [English](README.en.md) · [下载源码](https://github.com/zsy-smu/marauders-atlas/archive/refs/heads/main.zip) · [本地运行](#本地运行)
@@ -10,7 +12,7 @@
 
 **三卷地图 / 50 份地点档案 / 10 组楼层 / 3 个年代**
 
-目前没有确认可供所有访客直接打开的公开 Demo。[现有托管版](https://marauders-map-cn.zsiyuan202.chatgpt.site/)受访问权限限制；下载源码后可以独立运行。
+在线版无需登录，也可以下载源码在本地运行。
 
 ## 可以怎么玩
 
