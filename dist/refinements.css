@@ -71,6 +71,11 @@ html{overflow:hidden}.workspace{overflow:hidden}.detail-toolbar>span{display:non
 /* Quiet library details and an evidence-aware comparison, not a playable tunnel. */
 .workspace,.map-stage,.canvas{overflow:clip}
 .floor-feature-label{font:14px var(--serif);fill:#70513a;text-anchor:middle;paint-order:stroke;stroke:#ded4bc;stroke-width:3px;stroke-linejoin:round}
+.ground-walk{fill:#d4cdb6;stroke:none}
+.ground-floor .room-label{font-size:30px}
+.ground-garden{fill:url(#dots);stroke:#71664d;stroke-width:1.4}
+.ground-caption{font:13px var(--serif);fill:#716047;text-anchor:middle;paint-order:stroke;stroke:#ded4bc;stroke-width:2px}
+.ground-index-link:focus-visible .clue-hit,.ground-index-link:hover .clue-hit{fill:#8c593b22;stroke:#843d27;stroke-width:2}
 .route.historic{opacity:.45;stroke-dasharray:4 9}.route.blocked.active-route,.route.historic.active-route{animation:none}.rubble{pointer-events:none}
 .era-compare{display:flex;gap:8px}.era-compare button{flex:1;min-width:0;min-height:48px;padding:8px 6px;border:1px solid #8b705677;background:#d7c6a633;font:12px/1.55 var(--serif);color:#695039;cursor:pointer}
 .era-compare button[aria-pressed="true"]{background:#a8874c33;box-shadow:inset 0 0 0 1px #8b7056;color:#513721}.era-compare button:hover{background:#b49b6f33}.mirror-comparison>p{border-left:2px solid #9c835c;padding-left:9px}

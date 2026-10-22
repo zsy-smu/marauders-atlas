@@ -146,7 +146,91 @@ window.MAPART = (() => {
       [[993,340],[993,920],[440,920]],[[1030,850],[1030,680],[940,680]]]
   };
   fourthPlan.cells=fourthPlan.rooms.map(room=>room.rect);
-  const planFor=f=>f==='third'?thirdPlan:f==='fourth'?fourthPlan:floorPlan;
+  // The Entrance Hall and cloisters are public circulation spaces. `cells` is
+  // the non-walkable envelope here, not a claim that all named spaces are closed.
+  const groundPlan={
+    rooms:[{id:'courtyard',rect:[210,310,390,450],door:[600,690,600,750]},
+      {id:'entrance',rect:[650,350,245,410],door:[650,690,650,750]},
+      {id:'great-hall',rect:[940,270,470,500],door:[940,505,940,585]}],
+    corridors:[[220,320,370,60],[220,690,370,60],[220,320,60,430],[530,320,60,430],
+      [590,690,150,70],[650,470,245,290],[740,470,80,450],[895,505,45,80],
+      [210,810,1220,80],[210,690,70,200]],
+    garden:[280,385,250,300],stairs:[700,365,160,105],hourglasses:[660,490,42,185],
+    patrols:[[[250,345],[560,345],[560,720],[775,720],[775,850]],
+      [[1375,850],[795,850],[795,520]],
+      [[240,845],[240,720],[560,720],[560,345]],
+      [[915,545],[770,545],[770,845],[1190,845]]]
+  };
+  groundPlan.cells=[groundPlan.rooms.find(room=>room.id==='great-hall').rect,
+    groundPlan.garden,groundPlan.stairs,groundPlan.hourglasses];
+  const planFor=f=>f==='ground'?groundPlan:f==='third'?thirdPlan:f==='fourth'?fourthPlan:floorPlan;
+  function greatHallInterior(x,y,w,h){let o='';
+    o+=rect(x+25,y+25,w-50,62,'shade')+rect(x+35,y+84,w-70,9,'ink hair');
+    o+=rect(x+45,y+38,w-90,22,'wash','data-teachers-table="true"');
+    for(let i=0;i<11;i++)o+=rect(x+54+i*32,y+27,17,7,'ink hair');
+    o+=text(x+w/2,y+78,'教师席','ground-caption');
+    for(let col=0;col<4;col++){const sx=x+56+col*98,sy=y+130;
+      o+=rect(sx,sy,38,263,'wash',`data-dining-table="${col}"`);
+      for(const bx of [sx-13,sx+45])o+=rect(bx,sy+7,6,249,'shade');
+      for(let row=0;row<10;row++){const yy=sy+15+row*25;
+        o+=circle(sx+9,yy,3.5,'ink hair')+circle(sx+29,yy,3.5,'ink hair');
+        o+=line(sx+17,yy-5,sx+17,yy+4,'ink hair')+line(sx+21,yy-5,sx+21,yy+4,'ink hair');
+      }
+      // Candle glyphs are an overhead decoration, not floor obstacles.
+      const cx=sx+19,cy=y+112;
+      o+=path(`M${cx-3} ${cy}v-12h6v12ZM${cx} ${cy-13}q-6 -6 0 -12q6 6 0 12`,'ink hair');
+    }
+    o+=text(x+w/2,y+h-61,'四张学院长桌 · 上方为魔法天花板','ground-caption');
+    for(let j=0;j<6;j++)o+=rect(x+w-6,y+110+j*51,12,23,'wash');
+    return o;
+  }
+  function entranceInterior(){let o='';const [x,y,w,h]=groundPlan.stairs;
+    o+=`<g data-marble-staircase="true">${rect(x,y,w,h,'wash')}`;
+    for(let i=0;i<10;i++)o+=line(x+6,y+8+i*9,x+w-6,y+8+i*9,'ink hair');
+    o+=path(`M${x-9} ${y+h}V${y-9}H${x+w+9}V${y+h}`,'ink')+'</g>';
+    o+=text(x+w/2,y+h+22,'大理石楼梯','ground-caption');
+    const houseLabels=['狮','獾','鹰','蛇'];
+    for(let i=0;i<4;i++){const hx=667,hy=496+i*44;
+      o+=`<g data-house-hourglass="${i}">${rect(hx,hy,28,35,'wash')}`;
+      o+=path(`M${hx+4} ${hy+4}h20l-9 13 9 14h-20l9 -14Z`,'ink hair');
+      o+=path(`M${hx+8} ${hy+27}h12l-6 -8Z`,'shade')+'</g>';
+      o+=text(hx-11,hy+23,houseLabels[i],'ground-caption');
+    }
+    o+=text(820,673,'学院沙漏','ground-caption');
+    // No point totals are fabricated for any of the three eras.
+    return o;
+  }
+  function groundFloor(){let o=defs+'<g class="ground-floor">',bounds=[];
+    o+=path('M180 275H620V320H915V245H1435V795H1455V915H845V950H715V915H185V790H180Z','shade');
+    for(const c of groundPlan.corridors)o+=rect(...c,'ground-walk');
+    o+=text(800,172,'GROUND FLOOR','region-title')+text(800,209,'地面层 · 门厅、礼堂与回廊','third-subtitle');
+    for(const room of groundPlan.rooms){const p=places.find(p=>p.id===room.id),[x,y,w,h]=room.rect,cx=x+w/2;
+      bounds.push({id:p.id,x:cx,y:y+h/2,w,h});
+      o+=`<g class="landmark" tabindex="0" role="button" data-place="${p.id}" aria-label="${p.name}，查看档案">${rect(x,y,w,h,'map-room',`data-room="${p.id}"`)}${rect(x+9,y+9,w-18,h-18,'ink hair')}`;
+      if(p.id==='great-hall')o+=greatHallInterior(x,y,w,h);
+      else if(p.id==='entrance')o+=entranceInterior();
+      else{const [gx,gy,gw,gh]=groundPlan.garden;
+        o+=rect(gx,gy,gw,gh,'ground-garden')+rect(gx+9,gy+9,gw-18,gh-18,'ink hair');
+        for(let i=0;i<6;i++)for(const yy of [331,735])o+=circle(245+i*61,yy,5,'wash');
+        for(let i=0;i<5;i++)for(const xx of [235,575])o+=circle(xx,405+i*60,5,'wash');
+        for(let i=0;i<5;i++)o+=path(`M${282+i*49} 379q24 -22 48 0M${282+i*49} 692q24 22 48 0`,'ink hair');
+        o+=text(cx,gy+gh/2-15,'露天庭院','room-label')+text(cx,gy+gh/2+18,'COURTYARD','room-en');
+        o+=text(cx,gy+gh/2+59,'四面回廊','ground-caption');
+      }
+      if(p.id==='entrance')o+=text(cx,y-24,'门厅','room-label')+text(cx,y-6,p.en,'room-en');
+      if(p.id==='great-hall')o+=text(cx,y+h-28,p.name,'room-label')+text(cx,y+h-10,p.en,'room-en');
+      o+='</g>';
+      const [ax,ay,bx,by]=room.door;
+      o+=path(`M${ax} ${ay}L${bx} ${by}`,'door-opening')+path(`M${ax} ${ay}h-35q0 35 35 35M${bx} ${by}h-35q0 -35 35 -35`,'ink hair');
+    }
+    o+=path('M735 917h80M735 917v-23h39v23m2 0v-23h39v23','ink');
+    o+=text(775,974,'橡木大门','floor-feature-label')+text(1188,929,'PUBLIC GALLERY','small-label');
+    // These are archive/floor-index links, not invented physical passages.
+    o+=`<g class="landmark ground-index-link" tabindex="0" role="button" data-place="kitchen" data-index-x="1205" aria-label="翻到地下厨房档案">${rect(1040,975,330,62,'clue-hit')}${text(1205,1012,'楼下厨房 · 翻到地下 ↗','clue-label')}</g>`;
+    o+=`<g class="landmark ground-index-link" tabindex="0" role="button" data-place="history" data-index-x="375" aria-label="翻到一楼魔法史教室档案">${rect(210,975,330,62,'clue-hit')}${text(375,1012,'上一楼 · 魔法史 ↗','clue-label')}</g>`;
+    o+=text(800,1090,'门厅与礼堂连接有原著依据 · 庭院位置、比例与门位为导览重建','small-label');
+    return {svg:o+'</g><g id="routes" class="routes"></g><g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:groundPlan};
+  }
   function thirdFloor(){let o=defs,bounds=[];
     o+=path('M225 300H650V235H1235V275H1390V955H1245V930H835V990H220V690H180V510H225Z','shade');
     // One continuous outline, without false walls through corridor intersections.
@@ -213,7 +297,7 @@ window.MAPART = (() => {
     [[1115,291],[1095,303],[1107,317],[1142,327],[1170,334]],
     [[826,688],[815,710],[804,738],[809,759],[830,777],[866,792],[906,816]]
   ];
-  function floor(f,era){if(f==='third')return thirdFloor();if(f==='fourth')return fourthFloor(era);let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
+  function floor(f,era){if(f==='ground')return groundFloor();if(f==='third')return thirdFloor();if(f==='fourth')return fourthFloor(era);let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
     o+=path('M185 214H1415V952H185ZM207 235H1392V930H207Z','shade','fill-rule="evenodd"');
     for(const c of floorPlan.corridors)o+=rect(...c,'wash');
     for(const [x,y] of [[205,242],[1395,242],[205,930],[1395,930]]){o+=circle(x,y,71,'shade')+circle(x,y,55,'ink');for(let i=0;i<18;i++){let a=i*Math.PI/9;o+=line(x+Math.cos(a)*20,y+Math.sin(a)*20,x+Math.cos(a)*53,y+Math.sin(a)*53,'ink hair')}o+=circle(x,y,19)}

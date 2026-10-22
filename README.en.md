@@ -35,7 +35,9 @@ Character routes are illustrative animations, not canonical event replays. Hogsm
 
 ![Hogsmeade map](docs/images/hogsmeade.jpg)
 
-The third and fourth floors have their own layouts. The third includes a statue alcove, display gallery and tapestry clues; the fourth includes library shelves, reading tables, the Restricted Section and mirror passage. The other eight floor groups still share a guide layout.
+The ground, third and fourth floors have their own layouts. The ground floor includes the Entrance Hall, marble staircase, four House tables and courtyard cloisters. The third includes a statue alcove, display gallery and tapestry clues; the fourth includes library shelves, reading tables, the Restricted Section and mirror passage. The other seven floor groups still share a guide layout.
+
+![Independent ground-floor layout: cloisters, Entrance Hall, marble staircase and Great Hall](docs/images/ground-floor.jpg)
 
 <table>
   <tr>
@@ -83,7 +85,7 @@ Start with `dist/data.js` for records, `dist/art.js` for floor geometry and rout
 npm run check
 ```
 
-Checks cover scripts, records, assets, animation and routes. The route check currently samples 92,475 positions across 10 floor groups × 3 eras, including clearance for both shoes. This tests internal consistency, not canonical geography or exhaustive real-device compatibility.
+Checks cover scripts, records, assets, animation and routes. The route check currently samples 94,503 positions across 10 floor groups × 3 eras, including clearance for both shoes. This tests internal consistency, not canonical geography or exhaustive real-device compatibility.
 
 Serve `dist/` as the site root. A manually triggered Pages workflow is included: select GitHub Actions under Settings → Pages, then run Actions → Deploy GitHub Pages. It uploads `dist/`; source pushes do not automatically publish a site. Branch-based Pages publishing only accepts the root or `/docs`, not `/dist`. See [GitHub’s documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 

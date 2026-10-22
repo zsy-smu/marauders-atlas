@@ -73,5 +73,9 @@ window.ATLAS = (() => {
   const mirrorComparison={boundary:'较早年代仅为坍塌前推定，不证明 1976 年可通行；出口未详。1993 已坍塌，1998 未见修复依据。'};
   places.find(p=>p.id==='mirror').details[1]='1976 图层为较早年代重建，并非当年可通行的确证';
   places.find(p=>p.id==='library').evidence=[{label:'官方图书馆资料',url:official+'fact-file/locations/the-hogwarts-library'},{label:'官方禁书区资料',url:official+'fact-file/locations/the-restricted-section'}];
+  places.find(p=>p.id==='entrance').book='《魔法石》第7、15章；官方礼堂条目';
+  places.find(p=>p.id==='entrance').details=['橡木大门、大理石楼梯与学院沙漏有原著线索','官方资料确认门厅与礼堂相连','庭院位置、回廊形状与门位为导览重建'];
+  places.find(p=>p.id==='entrance').evidence=[{label:'官方礼堂资料：与门厅相连',url:S.hall}];
+  places.find(p=>p.id==='great-hall').evidence=[{label:'官方礼堂资料',url:S.hall},{label:'官方厨房资料：位于礼堂下方',url:official+'fact-file/locations/hogwarts-kitchens'}];
   return {places,floors,eras,sources:S,state,connections,mirrorComparison};
 })();

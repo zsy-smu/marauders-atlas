@@ -27,6 +27,29 @@ for (const [floor] of context.ATLAS.floors) for (const era of ['1976', '1993', '
       samples++;
     }
   }
+  if (floor === 'ground') {
+    assert.notEqual(plan, art.floorPlan, 'Ground floor must not use the generic guide grid');
+    assert.notEqual(plan, art.planFor('third'));
+    assert.notEqual(plan, art.planFor('fourth'));
+    assert.equal(plan.rooms.length, 3);
+    for (const room of plan.rooms) {
+      const b = art.floor(floor, era).bounds.find(b => b.id === room.id), [x, y, w, h] = room.rect;
+      assert.equal(b.x, x + w / 2); assert.equal(b.y, y + h / 2);
+      assert.equal(b.w, w); assert.equal(b.h, h);
+    }
+    assert.equal((svg.match(/data-dining-table=/g) || []).length, 4, 'Exactly four House tables');
+    assert.equal((svg.match(/data-teachers-table=/g) || []).length, 1);
+    assert.equal((svg.match(/data-house-hourglass=/g) || []).length, 4, 'Four hourglasses, without invented totals');
+    assert(svg.includes('data-marble-staircase="true"'));
+    assert(svg.includes('data-place="kitchen"') && svg.includes('data-place="history"'));
+    assert(context.ATLAS.places.some(p => p.id === 'kitchen' && p.floor === 'dungeon'));
+    assert(context.ATLAS.places.some(p => p.id === 'history' && p.floor === 'first'));
+    const entrance = plan.rooms.find(r => r.id === 'entrance').rect;
+    const courtyard = plan.rooms.find(r => r.id === 'courtyard').rect;
+    assert(plan.patrols.some(r => r.some(([x, y]) => inRect(x, y, entrance))), 'Public Entrance Hall is genuinely walkable');
+    assert(plan.patrols.some(r => r.some(([x, y]) => inRect(x, y, courtyard))), 'Patrols use the cloister, not the generic cross');
+    assert(svg.includes('庭院位置、比例与门位为导览重建'));
+  }
   if (floor === 'fourth') {
     assert.notEqual(plan, art.floorPlan, 'Fourth floor must not use the generic four-cell plan');
     assert.notEqual(plan, art.planFor('third'), 'Fourth floor must differ from the third-floor pilot');
@@ -79,4 +102,4 @@ assert(context.ATLAS.state(mirror, '1976').includes('未确认'), 'Do not claim 
 assert(context.ATLAS.state(mirror, '1993').includes('已坍塌'));
 assert(context.ATLAS.state(mirror, '1998').includes('修复'));
 assert.equal(context.ATLAS.places.find(p => p.id === 'library').evidence.length, 2);
-console.log(`OK: ${samples} floor-route samples across 10 floors × 3 eras, including both-shoe clearance; independent third/fourth-floor plans, archive endpoints and matching patrols; mirror inference/collapse states; village tracking excluded. Grounds traces require visual review, not blueprint proof.`);
+console.log(`OK: ${samples} floor-route samples across 10 floors × 3 eras, including both-shoe clearance; independent ground/third/fourth-floor plans, public hall/cloisters, archive endpoints and matching patrols; mirror inference/collapse states; village tracking excluded. Grounds traces require visual review, not blueprint proof.`);
