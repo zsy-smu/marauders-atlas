@@ -1,10 +1,10 @@
-![霍格沃茨校域地图：城堡、黑湖、禁林与人物足迹](docs/images/grounds.jpg)
+![活点地图操作演示：墨迹显影、人物足迹与打人柳地点档案](docs/images/marauders-atlas-demo.gif)
 
 # 活点地图 · Marauder’s Atlas
 
 一张可以缩放、翻阅地点档案、观察人物脚印的霍格沃茨地图。中文界面，非官方同人项目，用原生 JavaScript 和 SVG 制作。
 
-[English](README.en.md) · [下载源码](https://github.com/zsy-smu/marauders-atlas/archive/refs/heads/main.zip) · [本地运行](#本地运行) · [制作记录](#制作记录)
+[English](README.en.md) · [下载源码](https://github.com/zsy-smu/marauders-atlas/archive/refs/heads/main.zip) · [本地运行](#本地运行)
 
 [![Static checks](https://github.com/zsy-smu/marauders-atlas/actions/workflows/check.yml/badge.svg)](https://github.com/zsy-smu/marauders-atlas/actions/workflows/check.yml)
 
@@ -47,14 +47,6 @@
 手机上可以用目录找地点，档案从下方打开，文字单独滚动。下面是四楼年代对照的实际截图：
 
 <p align="center"><img src="docs/images/fourth-floor-era.jpg" width="300" alt="手机端四楼镜后密道的年代对照"></p>
-
-## 怎么做的
-
-纸面参考的是粗糙的旧新闻纸：纤维、污渍、折痕和透印叠在底纹上，插画与墨迹通过混合层融入纸面。两张大幅底图是生成式插画，不是官方地图扫描；地名、可点击区域、路线和人物另行绘制。
-
-开图显影使用 SVG 噪声遮罩。脚印按移动距离左右交替落下，有八级磨损遮罩，使用固定数量的节点循环更新。楼层绘图与行走路线共用坐标，避免改了房间、人物还沿着旧布局走。
-
-整个项目是静态 HTML、CSS、JavaScript 和 SVG，没有框架、构建步骤或运行时第三方依赖。
 
 ## 本地运行
 
@@ -102,24 +94,6 @@ npm run check
 部署时将 `dist/` 作为静态站点根目录。仓库已附手动触发的 Pages 工作流：Settings → Pages 选择 GitHub Actions，再运行 Actions → Deploy GitHub Pages。工作流会上传 `dist/`；推送源码不会自动发布站点。GitHub 的分支部署只能选根目录或 `/docs`，不能直接选 `/dist`。见[官方说明](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)。
 
 </details>
-
-## 资料依据与未完成的部分
-
-档案优先参考七部小说及官方 HarryPotter.com／J.K. Rowling 资料，Harry Potter Lexicon 用来辅助查找章节。每份档案附有作品线索和资料链接。发现错误，欢迎带章节或出处[提 Issue](https://github.com/zsy-smu/marauders-atlas/issues)。
-
-50 是档案数，包含跨分卷的关联条目，不代表 50 个互不重复的地点。楼层平面是导览示意，不是官方建筑蓝图。三个年代用于切换人物组与资料状态，也不是完整的历史场景模拟。
-
-后续主要补其余楼层的独立布局、核对空间线索，并继续做真实手机上的可读性测试。
-
-## 制作记录
-
-- [纸纹、插画与生成提示词](docs/ARTWORK.md)
-- [墨迹显影与脚印动画](docs/ANIMATION.md)
-- [三楼布局与密道关联](docs/THIRD-FLOOR.md)
-- [四楼图书馆与年代对照](docs/FOURTH-FLOOR.md)
-- [手机可读性与路线检查](docs/READABILITY-AND-ROUTES.md)
-- [内容依据](docs/LORE.md)
-- [项目介绍文案与配图](docs/SHARE.md)
 
 ## 许可
 

@@ -1,10 +1,10 @@
-![Hogwarts grounds, lake, forest and character footprints](docs/images/grounds.jpg)
+![Marauder’s Atlas demo: ink reveal, moving footprints and the Whomping Willow record](docs/images/marauders-atlas-demo.gif)
 
 # Marauder’s Atlas · 活点地图
 
 An interactive Hogwarts map with location records, illustrated floor plans and moving footprints. An unofficial fan project built with vanilla JavaScript and SVG. **The app interface and records are in Chinese.**
 
-[简体中文](README.md) · [Download source](https://github.com/zsy-smu/marauders-atlas/archive/refs/heads/main.zip) · [Run locally](#run-locally) · [Making-of notes](#making-of-notes)
+[简体中文](README.md) · [Download source](https://github.com/zsy-smu/marauders-atlas/archive/refs/heads/main.zip) · [Run locally](#run-locally)
 
 [![Static checks](https://github.com/zsy-smu/marauders-atlas/actions/workflows/check.yml/badge.svg)](https://github.com/zsy-smu/marauders-atlas/actions/workflows/check.yml)
 
@@ -46,14 +46,6 @@ On phones, a directory helps locate places and records open in a separately scro
 
 <p align="center"><img src="docs/images/fourth-floor-era.jpg" width="300" alt="Fourth-floor era comparison on a phone-sized screen"></p>
 
-## Implementation
-
-The paper uses an aged newsprint texture with fibres, stains, folds and print-through. Blend layers integrate the illustrations and ink. The two large backgrounds are generated illustrations, not official map scans; labels, hotspots, routes and characters are separate layers.
-
-The ink reveal uses an SVG noise mask. Footprints alternate by travelled distance, wear through eight mask stages and reuse a fixed pool of nodes. Floor drawings and walking routes share coordinates.
-
-The app is static HTML, CSS, JavaScript and SVG: no framework, build step or third-party runtime dependencies.
-
 ## Run locally
 
 With Node.js 20 or newer:
@@ -94,26 +86,6 @@ Checks cover scripts, records, assets, animation and routes. The route check cur
 Serve `dist/` as the site root. A manually triggered Pages workflow is included: select GitHub Actions under Settings → Pages, then run Actions → Deploy GitHub Pages. It uploads `dist/`; source pushes do not automatically publish a site. Branch-based Pages publishing only accepts the root or `/docs`, not `/dist`. See [GitHub’s documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 
 </details>
-
-## Sources and limitations
-
-Records prioritise the seven novels and official HarryPotter.com / J.K. Rowling material, with the unofficial Harry Potter Lexicon used to help locate chapters. Each record includes story references and source links. Corrections with chapter references are welcome in [Issues](https://github.com/zsy-smu/marauders-atlas/issues).
-
-The 50 records include cross-volume references, not 50 wholly distinct locations. Floor plans are guide illustrations, not official architectural blueprints. The eras select character groups and record states, rather than simulating complete historical scenes.
-
-Further work focuses on independent layouts for the remaining floors, checking spatial evidence and testing readability on real phones.
-
-## Making-of notes
-
-The detailed notes are in Chinese:
-
-- [Texture, illustrations and image prompts](docs/ARTWORK.md)
-- [Ink reveal and footprint animation](docs/ANIMATION.md)
-- [Third-floor layout and connections](docs/THIRD-FLOOR.md)
-- [Fourth-floor library and era comparison](docs/FOURTH-FLOOR.md)
-- [Mobile readability and route checks](docs/READABILITY-AND-ROUTES.md)
-- [Lore sources](docs/LORE.md)
-- [Sharing copy and images](docs/SHARE.md)
 
 ## License
 
