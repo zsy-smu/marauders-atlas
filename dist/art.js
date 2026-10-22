@@ -103,7 +103,7 @@ window.MAPART = (() => {
   function furniture(p,x,y,w,h){let o='';const id=p.id;const usableH=h-68;
     const desk=(dx,dy,wide=40)=>rect(dx,dy,wide,17,'shade')+rect(dx+7,dy+23,wide-14,8,'ink hair');
     const bookcase=(dx,dy,wide=105)=>{let q=rect(dx,dy,wide,20,'ink');for(let a=6;a<wide-4;a+=6)q+=line(dx+a,dy+2,dx+a+1,dy+18,'ink hair');return q};
-    if(['history','charms','defence','potions'].includes(id)){for(let row=0;row<3;row++)for(let col=0;col<4;col++){const dx=x+38+col*90,dy=y+46+row*36;o+=desk(dx,dy);if(id==='potions')o+=circle(dx+20,dy+7,6)}o+=desk(x+w/2-58,y+15,116)+bookcase(x+18,y+h-56,95);}
+    if(['history','charms','defence','potions'].includes(id)){for(let row=0;row<3;row++)for(let col=0;col<4;col++){const dx=x+38+col*(w-110)/3,dy=y+46+row*36;o+=desk(dx,dy);if(id==='potions')o+=circle(dx+20,dy+7,6)}o+=desk(x+w/2-58,y+15,116)+bookcase(x+18,y+h-56,95);}
     else if(['great-hall','kitchen'].includes(id)){for(let col=0;col<4;col++){let dx=x+50+col*85;o+=rect(dx,y+39,33,usableH-21,'shade');for(let row=0;row<5;row++)o+=rect(dx-8,y+44+row*20,6,12,'ink hair')+rect(dx+35,y+44+row*20,6,12,'ink hair')}o+=rect(x+29,y+15,w-58,15,'shade');}
     else if(id==='library'){for(let col=0;col<3;col++)for(let row=0;row<3;row++)o+=bookcase(x+25+col*126,y+22+row*45,106);o+=rect(x+w-45,y+12,23,h-60,'ink hair');}
     else if(['myrtle','boys-bathroom'].includes(id)){for(let col=0;col<5;col++){const xx=x+28+col*72;o+=rect(xx,y+22,55,77,'ink hair')+path(`M${xx+10} ${y+99}q32 -2 33 -28`,'ink hair')+circle(xx+27,y+49,12);o+=`<ellipse cx="${xx+28}" cy="${y+usableH+8}" rx="15" ry="9" class="ink"/>`+line(xx+28,y+usableH-3,xx+28,y+usableH+3)}o+=rect(x+15,y+usableH-8,w-30,39,'ink hair')}
@@ -126,13 +126,51 @@ window.MAPART = (() => {
     cells:[[285,300,410,237],[880,300,410,237],[285,700,410,182],[880,700,410,182]],
     patrols:[[[337,608],[790,608],[1250,608]],[[1240,630],[790,630],[350,630]],[[778,850],[778,617],[778,370]],[[802,350],[802,608],[390,608]]]
   };
+  // Third-floor pilot: only the named connections are evidence-based. Wing shape,
+  // doors, distances and furnishing positions remain original guide reconstruction.
+  const thirdPlan={
+    corridors:[[230,550,1140,80],[550,300,80,330],[1270,300,80,630],[530,390,100,70],[935,500,80,50],[410,630,80,90],[1210,770,60,60]],
+    rooms:[{id:'witch',rect:[260,315,270,180],door:[530,390,530,460]},
+      {id:'trophy',rect:[730,265,480,235],door:[935,500,1015,500]},
+      {id:'charms',rect:[880,710,330,200],door:[1210,770,1210,830]},
+      {id:'forbidden-corridor',rect:[255,720,380,175],door:[410,720,490,720]}],
+    patrols:[[[280,574],[1310,574],[1310,350]],[[1230,608],[590,608],[590,325]],
+      [[1292,888],[1292,600],[850,600]],[[610,330],[610,590],[350,590]]]
+  };
+  thirdPlan.cells=thirdPlan.rooms.map(room=>room.rect);
+  const planFor=f=>f==='third'?thirdPlan:floorPlan;
+  function thirdFloor(){let o=defs,bounds=[];
+    o+=path('M225 300H650V235H1235V275H1390V955H1245V930H835V990H220V690H180V510H225Z','shade');
+    // One continuous outline, without false walls through corridor intersections.
+    o+=path('M230 550H550V460H530V390H550V300H630V550H935V500H1015V550H1270V300H1350V550H1370V630H1350V930H1270V830H1210V770H1270V630H490V720H410V630H230Z','wash');
+    o+=text(800,172,'THIRD FLOOR','region-title')+text(800,209,'三楼 · 雕像、陈列廊与挂毯后的近路','third-subtitle');
+    // Hatched, unnamed spaces are not extra invented rooms.
+    o+=path('M670 675H810V925H670Z','ink hair','style="stroke-dasharray:3 8;opacity:.3"');
+    for(const room of thirdPlan.rooms){const p=places.find(p=>p.id===room.id),[x,y,w,h]=room.rect,cx=x+w/2;
+      bounds.push({id:p.id,x:cx,y:y+h/2,w,h});
+      const outline=p.id==='witch'?path(`M${x} ${y+h}V${y+40}Q${x} ${y} ${x+40} ${y}H${x+w-40}Q${x+w} ${y} ${x+w} ${y+40}V${y+h}Z`,'map-room',`data-room="${p.id}"`):rect(x,y,w,h,'map-room',`data-room="${p.id}"`);
+      o+=`<g class="landmark" tabindex="0" role="button" data-place="${p.id}" aria-label="${p.name}，查看档案">${outline}${rect(x+9,y+9,w-18,h-18,'ink hair')}${furniture(p,x,y,w,h)}${text(cx,y+h-26,p.name,'room-label')}${text(cx,y+h-9,p.en,'room-en')}</g>`;
+      const [ax,ay,bx,by]=room.door;
+      o+=path(`M${ax} ${ay}L${bx} ${by}`,'door-opening')+path(ax===bx?`M${ax} ${ay}h-40q0 40 40 40`:`M${ax} ${ay}v-40q40 0 40 40`,'ink hair');
+      for(let j=0;j<Math.floor(w/72)-1;j++)o+=rect(x+35+j*72,y-6,23,12,'wash');
+    }
+    o+=text(395,290,'走廊雕像 · 非独立教室','small-label')+text(445,928,'1991—92 年历史地点 · 当前不放置路威','small-label');
+    o+=text(920,659,'PUBLIC CORRIDOR','small-label')+text(1390,801,'通行廊 · 导览重建','small-label','transform="rotate(-90 1390 801)"');
+    for(let j=0;j<16;j++)for(const y of [553,623])o+=rect(260+j*68,y,5,4,'ink hair');
+    // Illustrative stair links; these do not assert a canonical staircase location.
+    for(const [sx,sy] of [[590,282],[1310,948]]){o+=circle(sx,sy,30,'wash');for(let j=0;j<6;j++)o+=line(sx-20+j*2,sy-12+j*5,sx+20-j*2,sy-12+j*5,'ink hair')}
+    o+=`<g id="routes" class="routes">${path('M730 432H692V672H844V780H880','route','data-route="tapestry"')}${path('M395 330V255Q360 230 265 230H145','route','data-route="witch-honey"')}</g>`;
+    o+=`<g class="passage-clue" role="button" tabindex="0" data-route-trigger="tapestry" aria-label="展开挂毯捷径，查看奖品陈列室与魔咒课走廊两端">${rect(651,648,180,88,'clue-hit')}${path('M727 415h9v37h-9m-5 -35v32m17 -32v32','ink hair')}${text(741,692,'挂毯捷径 ↗','clue-label')}</g>`;
+    o+=text(205,213,'通往蜂蜜公爵地窖 ↗','clue-label')+text(800,1040,'连接关系有原著依据 · 翼廊、门位与路径曲折为导览重建','small-label');
+    return {svg:o+'<g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:thirdPlan};
+  }
   // Short sections traced against visible paths in our own grounds illustration.
   // Do not extrapolate paths behind perspective buildings, into the lake or village.
   const groundsPatrols=[
     [[1115,291],[1095,303],[1107,317],[1142,327],[1170,334]],
     [[826,688],[815,710],[804,738],[809,759],[830,777],[866,792],[906,816]]
   ];
-  function floor(f,era){let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
+  function floor(f,era){if(f==='third')return thirdFloor();let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
     o+=path('M185 214H1415V952H185ZM207 235H1392V930H207Z','shade','fill-rule="evenodd"');
     for(const c of floorPlan.corridors)o+=rect(...c,'wash');
     for(const [x,y] of [[205,242],[1395,242],[205,930],[1395,930]]){o+=circle(x,y,71,'shade')+circle(x,y,55,'ink');for(let i=0;i<18;i++){let a=i*Math.PI/9;o+=line(x+Math.cos(a)*20,y+Math.sin(a)*20,x+Math.cos(a)*53,y+Math.sin(a)*53,'ink hair')}o+=circle(x,y,19)}
@@ -163,5 +201,5 @@ window.MAPART = (() => {
     o+=`<g class="landmark" data-place="high-street" role="button" tabindex="0" aria-label="主街，查看档案">${text(1000,780,'HIGH STREET','calligraphy','transform="rotate(-39 1000 780)"')}</g>`;
     return o+'<g id="selectedOverlay"></g>';
   }
-  return {world,village,illustratedWorld,illustratedVillage,floor,prop,castle,defs,ribbon,seed,floorPlan,groundsPatrols};
+  return {world,village,illustratedWorld,illustratedVillage,floor,prop,castle,defs,ribbon,seed,floorPlan,planFor,groundsPatrols};
 })();

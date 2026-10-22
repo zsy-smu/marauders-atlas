@@ -66,5 +66,9 @@ window.ATLAS = (() => {
   places.find(p=>p.id==='zonko').book='《阿兹卡班囚徒》第14章；《混血王子》第18章';
   const eras={1976:{label:'掠夺者时期',people:['James Potter','Sirius Black','Remus Lupin','Peter Pettigrew']},1993:{label:'阿兹卡班囚徒',people:['Harry Potter','Hermione Granger','Peter Pettigrew','Argus Filch']},1998:{label:'霍格沃茨之战前',people:['Neville Longbottom','Ginny Weasley','Luna Lovegood','Severus Snape']}};
   function state(p,era){if(p.id==='zonko')return era==='1998'?'已在1996—97年间关门；1998年经营状态未明':era==='1993'?'学生可以光顾；双胞胎钟爱的店铺':'此时经营细节未在原著明确';if(p.route==='ariana')return era==='1998'?'1998年附注：肖像后通道已出现':'所选年代尚无这条肖像通道';if(p.id==='mirror')return era==='1976'?'坍塌前的旧通道；终点未明确':'已坍塌，禁止通行';if(p.id==='cave')return era==='1993'?'小天狼星1995年藏身事件尚未发生':era==='1976'?'山洞存在；此期用途未明':'可查看1995年及后来的藏身记录';if(p.id==='forbidden-corridor')return '历史地点：三头犬与魔法石关卡属于1991—92学年';if(p.blind)return '原地图盲区；屋内不显示人物足迹';return era==='1976'?'掠夺者时期 · 地点示意':era==='1998'?'1998年 · 事件见档案，未确认的经营状态不作断言':'1993—94学年 · 地点示意'}
-  return {places,floors,eras,sources:S,state};
+  const connections=[
+    {id:'witch-honey',title:'驼背之后，糖果之下',ends:['witch','honeydukes'],hint:'一端是三楼的独眼女巫，另一端藏在糖果店地窖。沿着同一条线索翻到另一卷。',boundary:'两端连接有原著依据；中途路线为示意。翻阅档案不等于人物穿行，村内仍不显示追踪。'},
+    {id:'tapestry',title:'挂毯不是尽头',ends:['trophy','charms'],hint:'奖品陈列室附近的挂毯后，藏着通往魔咒课走廊的近路。试着对照两端，而不只看一间房。',boundary:'原著确认两端的联系，并非普通邻门；长度、转折与门位为导览重建。'}
+  ];
+  return {places,floors,eras,sources:S,state,connections};
 })();

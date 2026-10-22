@@ -46,7 +46,7 @@ for (const file of sources) {
   for (const match of paths) {
     const path = match[1];
     if (path.includes('${') || /^(?:#|https?:|data:)/.test(path)) continue;
-    assert(existsSync(resolve(dist, path)), `Missing asset in ${file}: ${path}`);
+    assert(existsSync(resolve(dist, path.split(/[?#]/)[0])), `Missing asset in ${file}: ${path}`);
   }
 }
 assert(!existsSync(resolve(root, '.openai')) && !existsSync(resolve(dist, '.openai')), 'Private hosting metadata must not ship');

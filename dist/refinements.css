@@ -45,3 +45,26 @@ html{overflow:hidden}.workspace{overflow:hidden}.detail-toolbar>span{display:non
 }
 @media(max-width:360px){.statusbar>div{gap:3px}.statusbar button{min-width:34px;font-size:10px}.statusbar .status-left{font-size:8px;max-width:47%}.map-legend{font-size:9px}.brand{font-size:16px}.top-actions{gap:6px}.era-label select{max-width:96px;font-size:10px}}
 @media(max-width:360px){.masthead{padding-left:12px;padding-right:12px}.brand{font-size:15px;gap:7px}.brand-mark{width:26px;font-size:24px}.brand small{font-size:5px}.top-actions{gap:4px}.era-label select{max-width:89px}.views{margin-top:12px}}
+/* Third-floor pilot and connected reading: restrained ink, not a new game layer. */
+.floor-mode .paper .map-title{max-width:calc(100% - 55px)}.floor-mode .paper .map-title p{letter-spacing:0;line-height:1.5}
+@media(min-width:801px){.floor-mode .floor-strip{top:112px}.floor-mode .canvas{top:156px}}
+.third-subtitle{font:16px var(--serif);fill:#73634c;text-anchor:middle;letter-spacing:.12em}
+.door-opening{fill:none;stroke:#d8ceb5;stroke-width:8;stroke-linecap:butt}
+.passage-clue{cursor:pointer;outline:none}.clue-hit{fill:transparent;stroke:none}
+.clue-label{font:15px var(--serif);fill:#84523b;text-anchor:middle;paint-order:stroke;stroke:#ded4bc;stroke-width:4px;stroke-linejoin:round}
+.passage-clue:hover .clue-label,.passage-clue:focus .clue-label{fill:#722d1e;text-decoration:underline}
+.landmark:focus-visible .map-room{stroke:#843d27;stroke-width:3}
+.detail-connection{margin:22px 0;padding:16px 13px;border-top:1px solid #92765377;border-bottom:1px solid #92765377;background:#8b683908}
+.detail-connection h3{font:20px var(--serif);margin:8px 0 10px;color:#63462e}.detail-connection p{font:13px/1.8 var(--serif);margin:0 0 12px}.detail-connection small{display:block;font:11px/1.75 var(--ui);color:#7c6b52;margin-top:12px}
+.connection-link,.connection-map{display:block;width:100%;text-align:left;cursor:pointer;font:13px/1.5 var(--serif);min-height:44px;padding:10px;border:1px solid #8b705655;background:#d9ccb16b;color:#63462e}
+.connection-map{border:0;background:none;font-size:12px;text-decoration:underline;text-underline-offset:4px}
+.connection-link:hover,.connection-link:focus-visible{background:#b29b6f33}
+.passage-trail[hidden]{display:none}.passage-trail{position:absolute;z-index:9;left:22px;right:22px;bottom:80px;max-width:580px;margin:auto;padding:15px 20px 12px;background:#e1d5bdf5;border:1px solid #8b705677;box-shadow:0 3px 14px #3b2b1722}
+.passage-trail h3{font:20px var(--serif);margin:7px 30px 10px 0;color:#664a32}.passage-trail p{font:11px/1.7 var(--ui);color:#78654d;margin:10px 0 0}.passage-close{position:absolute;right:7px;top:6px;min-width:44px;min-height:44px;background:none;border:0;font-size:23px;cursor:pointer;color:#775d42}
+.passage-ends{display:flex;align-items:center;gap:8px}.passage-ends button{flex:1;min-height:44px;border:1px solid #8b70565e;background:#d7c6a666;color:#63462e;padding:8px;font:13px/1.5 var(--serif);cursor:pointer}.passage-ends>span{color:#907959}
+.passage-open .canvas{bottom:230px}
+@media(max-width:800px){
+  .detail-connection{padding:16px;margin:20px 0}.detail-connection p{font-size:14px}.detail-connection small{font-size:12px}.connection-link,.connection-map{font-size:14px;min-height:48px}
+  .passage-trail{bottom:76px;left:14px;right:14px;padding:12px 13px;max-width:none}.passage-trail h3{font-size:19px;margin:5px 30px 8px 0}.passage-trail .eyebrow{font-size:8px}.passage-ends{gap:5px}.passage-ends button{font-size:13px;min-height:48px;padding:7px 5px}.passage-trail p{font-size:10px;margin-top:8px}.passage-open .canvas{top:16px;bottom:255px}.passage-open .map-legend,.passage-open .map-title,.passage-open .floor-strip{display:none}
+}
+@media(max-width:800px) and (max-height:680px){.passage-trail p{font-size:9px;line-height:1.6;margin-top:5px}.passage-trail{padding-top:8px;padding-bottom:8px}.passage-trail .eyebrow{display:none}.passage-trail h3{font-size:16px}.passage-open .canvas{top:16px;bottom:230px}}
