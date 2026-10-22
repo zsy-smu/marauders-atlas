@@ -1,74 +1,62 @@
-<div align="center">
+![Hogwarts grounds, lake, forest and character footprints](docs/images/grounds.jpg)
 
 # Marauder’s Atlas · 活点地图
 
-### Unfold Hogwarts on a sheet of weathered paper.
+An interactive Hogwarts map with location records, illustrated floor plans and moving footprints. An unofficial fan project built with vanilla JavaScript and SVG. **The app interface and records are in Chinese.**
 
-Ink that awakens. Footprints that wear away. Stories you can follow from one place to another.
-
-**3 map volumes · 50 location records · 3 eras · Vanilla HTML / CSS / JavaScript / SVG**
-
-[简体中文](README.md) · [Quick start](#quick-start) · [Behind the map](#behind-the-map) · [Share the project](docs/SHARE.md)
+[简体中文](README.md) · [Download source](https://github.com/zsy-smu/marauders-atlas/archive/refs/heads/main.zip) · [Run locally](#run-locally) · [Making-of notes](#making-of-notes)
 
 [![Static checks](https://github.com/zsy-smu/marauders-atlas/actions/workflows/check.yml/badge.svg)](https://github.com/zsy-smu/marauders-atlas/actions/workflows/check.yml)
-[MIT code license](LICENSE) · No framework · No build step · No third-party runtime dependencies
 
-</div>
+**3 map volumes / 50 location records / 10 floor groups / 3 eras**
 
-![Hogwarts and its grounds, illustrated in an engraved style on aged paper](docs/images/grounds.jpg)
+There is currently no confirmed unrestricted public demo. The [hosted version](https://marauders-map-cn.zsiyuan202.chatgpt.site/) has access restrictions; the source runs independently.
 
-> “I solemnly swear that I am up to no good.”
->
-> Open the folded map, watch the ink emerge, and follow a familiar name into a story. Find the One-Eyed Witch on the third floor, turn to the Honeydukes cellar record, then find your way back.
+## Things to try
 
-Marauder’s Atlas is an unofficial Harry Potter fan project: part interactive map, part illustrated gazetteer. **The app interface and location records are in Chinese; this English README introduces the experience and codebase.**
+Open the cover to reveal the ink. Pan and zoom, then select a building or directory entry to read its record. Switch between the grounds, castle and Hogsmeade; linked passage records let you visit both ends.
 
-## Small details worth getting lost in
+- **Look for Filch.** The 1993–94 character group includes an illustrative patrol. Left and right footprints stay where they land, then gradually wear away. Pausing also stops their fading.
+- **Find the Room of Requirement.** Its marker remains a question mark, and its record explains why the map cannot reveal the people inside.
+- **Compare passage records across eras.** The mirror passage is marked as collapsed in 1993–94. Its 1976 view is conjectural, not evidence of access that year. The 1998 records also include the Ariana portrait passage.
+- **Follow the One-Eyed Witch to Honeydukes.** The third-floor record links to the cellar record in the Hogsmeade volume, with a link back.
 
-**Paper with a past.** Fibres, stains, print-through, folds and uneven edges sit beneath engraved-style artwork. Ink emerges through a noise mask; the imagery is blended into the paper rather than simply placed on a beige background.
+Character routes are illustrative animations, not canonical event replays. Hogsmeade is a companion gazetteer without village character tracking.
 
-**Footprints that stay where they land.** Left and right shoes alternate by travelled distance. Old impressions remain fixed, then erode through eight wear stages. Pause the map and even the ageing of old ink pauses with it.
+## The maps
 
-**Passages that connect stories.** Move between the One-Eyed Witch and Honeydukes records, or compare the tapestry near the Trophy Room with the Charms corridor. The archive links and map overlays share the same connection data.
-
-**Time with consequences.** On the fourth floor, compare a conjectural earlier view of the mirror passage with its known collapsed state. Unknown exits stay unknown; the Room of Requirement remains a map blind spot.
-
-## Three volumes to explore
-
-| Volume | What you can find |
+| Volume | Contents |
 | --- | --- |
-| **I · School & Grounds** | Castle, lake, forest, Willow, hut, greenhouses, pitch and station; 14 records |
-| **II · Within the Castle** | 10 floor groups and 24 records; independently designed third- and fourth-floor guide plans |
-| **III · Hogsmeade** | Sweet shops, pubs, quills, post and secrets beyond the village; 12 records |
+| Grounds | Castle, lake, forest, Willow, Hagrid’s hut, greenhouses, pitch, station and more; 14 records |
+| Castle | 10 floor groups, from dungeons to towers; 24 records |
+| Hogsmeade | Honeydukes, the Three Broomsticks, the Hog’s Head, quill shop, post office and more; 12 records |
 
-![The Hogsmeade companion map](docs/images/hogsmeade.jpg)
+![Hogsmeade map](docs/images/hogsmeade.jpg)
+
+The third and fourth floors have their own layouts. The third includes a statue alcove, display gallery and tapestry clues; the fourth includes library shelves, reading tables, the Restricted Section and mirror passage. The other eight floor groups still share a guide layout.
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/images/third-floor.jpg" alt="Third floor: statue alcove, display gallery and tapestry shortcut"><br><strong>Third floor · Statues & tapestries</strong><br>A distinct guide layout and clues that continue into another volume.</td>
-    <td width="50%"><img src="docs/images/fourth-floor.jpg" alt="Fourth floor: library shelves, reading tables, Restricted Section and mirror passage"><br><strong>Fourth floor · Pages & old passages</strong><br>A rope-separated Restricted Section and a route whose history matters.</td>
+    <td width="50%"><img src="docs/images/third-floor.jpg" alt="Third-floor statue alcove, gallery and tapestry shortcut"><br>Third floor: the One-Eyed Witch and tapestry clues</td>
+    <td width="50%"><img src="docs/images/fourth-floor.jpg" alt="Fourth-floor library, Restricted Section and mirror passage"><br>Fourth floor: the library and mirror passage</td>
   </tr>
 </table>
 
-## Your first little expedition
+On phones, a directory helps locate places and records open in a separately scrolling lower panel. This screenshot shows the fourth-floor era comparison:
 
-1. Touch the cover oath to reveal the ink.
-2. Find the One-Eyed Witch on the third floor. Follow the archive link to Honeydukes, then return.
-3. Explore the tapestry shortcut and its two records.
-4. Visit the fourth-floor library, then compare the mirror passage’s era layers.
-5. Zoom into the footprints, pause their fading, and finish with “Mischief managed.”
+<p align="center"><img src="docs/images/fourth-floor-era.jpg" width="300" alt="Fourth-floor era comparison on a phone-sized screen"></p>
 
-This is a suggested reading route, not a quest or reward system. Chinese labels guide the in-app interactions.
+## Implementation
 
-## Built for smaller screens, too
+The paper uses an aged newsprint texture with fibres, stains, folds and print-through. Blend layers integrate the illustrations and ink. The two large backgrounds are generated illustrations, not official map scans; labels, hotspots, routes and characters are separate layers.
 
-Mobile navigation uses a location directory and a lower-screen archive. Labels adapt to screen scale, comparison controls leave room for the map, and reduced-motion preferences are respected.
+The ink reveal uses an SVG noise mask. Footprints alternate by travelled distance, wear through eight mask stages and reuse a fixed pool of nodes. Floor drawings and walking routes share coordinates.
 
-<p align="center"><img src="docs/images/fourth-floor-era.jpg" width="300" alt="Mobile era comparison, with the map and evidence boundary visible together"></p>
+The app is static HTML, CSS, JavaScript and SVG: no framework, build step or third-party runtime dependencies.
 
-## Quick start
+## Run locally
 
-With **Node.js 20+**, run these three commands. **No `npm install` is required.**
+With Node.js 20 or newer:
 
 ```sh
 git clone https://github.com/zsy-smu/marauders-atlas.git
@@ -76,81 +64,59 @@ cd marauders-atlas
 npm start
 ```
 
-Open the printed address, normally `http://127.0.0.1:4173`. Local preview needs no account, API key or backend service. You can also [download the source ZIP](https://github.com/zsy-smu/marauders-atlas/archive/refs/heads/main.zip).
+No `npm install` is needed. Open the printed address, normally `http://127.0.0.1:4173`. No account, API key or backend is required. You can also download the source ZIP above and run `npm start` in the extracted directory.
 
-Or serve the static files with Python:
+Or use Python:
 
 ```sh
 python -m http.server 4173 --directory dist
 ```
 
-The [hosted version](https://marauders-map-cn.zsiyuan202.chatgpt.site/) is subject to its access policy; **it is not advertised as an unrestricted public demo**. The source runs independently. This documentation update does not change hosting permissions.
-
-| Control | Action |
-| --- | --- |
-| Landmark or directory entry | Locate a place and open its record |
-| `/` | Search places, character references and passages |
-| Drag, wheel or pinch | Pan and zoom |
-| `+`, `-`, `0` | Zoom in, zoom out, fit the map |
-| `Esc` | Close the current panel or comparison; otherwise fold the map |
-
-## Craft you can inspect
-
-- **Shared geometry:** rendered floor plans and walking routes use the same coordinates.
-- **Bounded animation:** planted impressions, a fixed stamp pool and progressive wear masks.
-- **Connected navigation:** cross-volume records, era comparisons and keyboard focus restoration.
-- **Explicit checks:** `npm run check` covers syntax, data, assets, animation and routes. The current route check samples 92,475 positions across 10 floor groups × 3 eras, including conservative clearance for both shoes.
-
-These checks establish internal consistency, not canonical geography or exhaustive real-device compatibility.
-
-## A map that knows its limits
-
-Records prioritise the novels and official Harry Potter material, with the unofficial Harry Potter Lexicon used as a chapter-index aid. Each record links to source material.
-
-- The 50 records include cross-volume references, not 50 wholly distinct locations.
-- Only the third and fourth floors currently have independent layouts; eight groups retain a shared guide template. None is an official architectural blueprint.
-- The three eras select illustrative character groups and record states, not complete historical simulations. The 1976 mirror view is conjectural, not proof the tunnel was usable then.
-- Hogsmeade is a companion gazetteer, without village character tracking. Footsteps are illustrative rather than live or canonical event replays.
-- The large map backgrounds are generated illustrations, not official scans. Labels, hotspots and movement are separate layers; asset origins and rights are documented.
-
-## Behind the map
-
-The detailed making-of notes are currently in Chinese:
-
-- [Artwork, texture and image prompts](docs/ARTWORK.md)
-- [Ink reveal, name scrolls and footprint erosion](docs/ANIMATION.md)
-- [Third-floor connections](docs/THIRD-FLOOR.md)
-- [Fourth-floor library and evidence-aware comparison](docs/FOURTH-FLOOR.md)
-- [Readability and route checks](docs/READABILITY-AND-ROUTES.md)
-- [Lore sources and boundaries](docs/LORE.md)
-
-Screenshots document different production stages; the floor and mobile images above show the recent independent layouts and comparison UI.
+Drag, scroll or pinch to navigate. Use `/` to search, `+` / `-` / `0` to adjust the view, and `Esc` to close the current panel or fold the map. Footprint, passage and pause controls are available. System reduced-motion preferences are respected.
 
 <details>
-<summary><strong>Source, checks and deployment</strong></summary>
+<summary>Source, checks and deployment</summary>
 
 ```text
-dist/       Static app: markup, styles, data, SVG plans and interaction
-scripts/    Dependency-free preview server and three check scripts
-docs/       Making-of notes, source boundaries and real screenshots
+dist/       Static app, records, SVG plans and assets
+scripts/    Preview server and checks
+docs/       Making-of notes, sources and screenshots
 ```
+
+Start with `dist/data.js` for records, `dist/art.js` for floor geometry and routes, and `dist/app.js` for interaction.
 
 ```sh
 npm run check
 ```
 
-Start with `dist/data.js` for records and `dist/art.js` for rooms, furniture and routes. Serve `dist/` as the web root. The optional GitHub Pages workflow is manually triggered; a source push runs checks but does not automatically publish a public site. See [GitHub’s deployment documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
+Checks cover scripts, records, assets, animation and routes. The route check currently samples 92,475 positions across 10 floor groups × 3 eras, including clearance for both shoes. This tests internal consistency, not canonical geography or exhaustive real-device compatibility.
+
+Serve `dist/` as the site root. A manually triggered Pages workflow is included: select GitHub Actions under Settings → Pages, then run Actions → Deploy GitHub Pages. It uploads `dist/`; source pushes do not automatically publish a site. Branch-based Pages publishing only accepts the root or `/docs`, not `/dist`. See [GitHub’s documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 
 </details>
 
-## Pass the map along
+## Sources and limitations
 
-If you enjoy Harry Potter, illustrated maps or expressive vanilla frontend work, a **Star** helps other curious explorers find this project. Share it with someone who would happily spend another evening wandering Hogwarts.
+Records prioritise the seven novels and official HarryPotter.com / J.K. Rowling material, with the unofficial Harry Potter Lexicon used to help locate chapters. Each record includes story references and source links. Corrections with chapter references are welcome in [Issues](https://github.com/zsy-smu/marauders-atlas/issues).
 
-[Issues](https://github.com/zsy-smu/marauders-atlas/issues) and contributions are welcome—especially chapter-backed corrections, spatial evidence and real-device readability feedback. [Ready-to-use sharing copy](docs/SHARE.md) is included.
+The 50 records include cross-volume references, not 50 wholly distinct locations. Floor plans are guide illustrations, not official architectural blueprints. The eras select character groups and record states, rather than simulating complete historical scenes.
 
-## License & acknowledgements
+Further work focuses on independent layouts for the remaining floors, checking spatial evidence and testing readability on real phones.
 
-Code and project documentation use the [MIT License](LICENSE). Asset provenance, inspiration, generated illustrations and existing rights are explained in [third-party notices](THIRD_PARTY_NOTICES.md) and [artwork notes](docs/ARTWORK.md).
+## Making-of notes
 
-This is an unofficial fan project, not affiliated with or endorsed by the rights holders. The code license does not grant rights to Harry Potter characters, names, settings or other existing intellectual property.
+The detailed notes are in Chinese:
+
+- [Texture, illustrations and image prompts](docs/ARTWORK.md)
+- [Ink reveal and footprint animation](docs/ANIMATION.md)
+- [Third-floor layout and connections](docs/THIRD-FLOOR.md)
+- [Fourth-floor library and era comparison](docs/FOURTH-FLOOR.md)
+- [Mobile readability and route checks](docs/READABILITY-AND-ROUTES.md)
+- [Lore sources](docs/LORE.md)
+- [Sharing copy and images](docs/SHARE.md)
+
+## License
+
+Code and project documentation use the [MIT License](LICENSE). Asset provenance and reference projects are listed in [third-party notices](THIRD_PARTY_NOTICES.md) and [artwork notes](docs/ARTWORK.md).
+
+This is an unofficial Harry Potter fan project, not affiliated with or endorsed by the rights holders. The code license does not grant rights to existing characters, names, settings or other intellectual property.
