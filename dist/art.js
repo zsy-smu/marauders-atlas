@@ -163,7 +163,83 @@ window.MAPART = (() => {
   };
   groundPlan.cells=[groundPlan.rooms.find(room=>room.id==='great-hall').rect,
     groundPlan.garden,groundPlan.stairs,groundPlan.hourglasses];
-  const planFor=f=>f==='ground'?groundPlan:f==='third'?thirdPlan:f==='fourth'?fourthPlan:floorPlan;
+  const dungeonPlan={
+    rooms:[{id:'potions',rect:[220,285,500,260],door:[440,545,520,545]},
+      {id:'slytherin',rect:[230,750,440,220],door:[590,750,650,750]},
+      {id:'kitchen',rect:[965,285,450,345],door:[965,470,965,540]},
+      {id:'hufflepuff',rect:[1010,780,370,205],door:[1095,780,1165,780]}],
+    corridors:[[780,235,80,760],[290,585,570,80],[440,545,80,40],
+      [590,665,70,85],[860,470,105,70],[860,665,520,70],[1095,735,70,45]],
+    fruitFrame:[938,472,30,64],barrels:[1164,733,96,44],
+    patrols:[[[815,255],[815,950]],[[330,610],[805,610],[805,280]],
+      [[1370,700],[835,700],[835,505],[925,505]],
+      [[620,720],[620,640],[835,640],[835,700],[1130,700],[1130,755]]]
+  };
+  dungeonPlan.cells=[...dungeonPlan.rooms.map(room=>room.rect),dungeonPlan.fruitFrame,dungeonPlan.barrels];
+  const planFor=f=>f==='dungeon'?dungeonPlan:f==='ground'?groundPlan:f==='third'?thirdPlan:f==='fourth'?fourthPlan:floorPlan;
+  function dungeonInterior(p,x,y,w,h){let o='';
+    if(p.id==='potions'){
+      o+=rect(x+22,y+17,w-44,25,'shade','data-potions-shelf="true"');
+      for(let j=0;j<23;j++){const bx=x+33+j*19;o+=path(`M${bx} ${y+34}v-10h4v-4h5v4h4v10Z`,'ink hair')}
+      for(let row=0;row<2;row++)for(let col=0;col<4;col++){const dx=x+44+col*109,dy=y+70+row*77;
+        o+=rect(dx,dy,66,42,'wash')+circle(dx+33,dy+21,15,'shade')+circle(dx+33,dy+21,10,'ink hair');
+        o+=path(`M${dx+15} ${dy+15}q-12 7 0 14m36 -14q12 7 0 14M${dx+25} ${dy+5}l-4 -14`,'ink hair');
+      }
+      o+=text(x+w/2,y+h-61,'材料架 · 坩埚课桌','ground-caption');
+    }else if(p.id==='kitchen'){
+      o+=rect(x+22,y+20,w-44,40,'shade','data-kitchen-hearth="true"');
+      for(let j=0;j<7;j++)o+=circle(x+47+j*58,y+40,10,'ink hair');
+      for(let col=0;col<4;col++){const dx=x+52+col*98,dy=y+90;
+        o+=rect(dx,dy,36,160,'wash',`data-kitchen-table="${col}"`);
+        for(let row=0;row<6;row++)o+=circle(dx+18,dy+15+row*25,7,'ink hair');
+      }
+      o+=text(x+w/2,y+h-59,'餐桌与楼上礼堂相对应','ground-caption');
+    }else if(p.id==='slytherin'){
+      o+=rect(x+25,y+23,w-50,32,'shade')+rect(x+38,y+31,w-76,16,'ink hair');
+      for(const dx of [x+45,x+w-120])o+=rect(dx,y+83,76,35,'wash','rx="5"')+rect(dx+8,y+89,60,22,'ink hair');
+      o+=rect(x+w/2-51,y+84,102,45,'wash','rx="3"');
+      for(let j=0;j<4;j++)o+=circle(x+45+j*116,y+64,5,'ink hair');
+      o+=text(x+w/2,y+h-56,'湖下石室 · 壁炉与皮沙发','ground-caption');
+    }else{
+      for(let j=0;j<5;j++){const a=(j+1)*Math.PI/6,px=x+w/2+Math.cos(a)*w*.35,py=y+66-Math.sin(a)*22;
+        o+=circle(px,py,9,'ink hair')+path(`M${px-5} ${py+1}l5 -8 5 8`,'ink hair');}
+      for(const dx of [x+57,x+w-99])o+=rect(dx,y+87,42,27,'wash','rx="9"');
+      o+=circle(x+w/2,y+110,26,'wash')+circle(x+w/2,y+110,21,'ink hair');
+      for(const dx of [x+93,x+w-93])o+=circle(dx,y+37,11,'wash');
+      o+=text(x+w/2,y+h-57,'圆窗 · 植物 · 圆桌','ground-caption');
+    }
+    return o;
+  }
+  function dungeonFloor(){let o=defs+'<g class="dungeon-floor">',bounds=[];
+    o+=path('M195 260H745V210H885V260H1440V655H1405V760H1400V1008H985V760H885V1015H755V690H695V995H205V725H265V560H195Z','shade');
+    for(const c of dungeonPlan.corridors)o+=rect(...c,'ground-walk');
+    o+=text(800,172,'THE DUNGEONS','region-title')+text(800,209,'地下 · 石墙、坩埚与厨房走廊','third-subtitle');
+    for(const room of dungeonPlan.rooms){const p=places.find(p=>p.id===room.id),[x,y,w,h]=room.rect,cx=x+w/2;
+      bounds.push({id:p.id,x:cx,y:y+h/2,w,h});
+      const outline=p.id==='hufflepuff'?`<ellipse cx="${cx}" cy="${y+h/2}" rx="${w/2}" ry="${h/2}" class="map-room" data-room="${p.id}"/>`:rect(x,y,w,h,'map-room',`data-room="${p.id}"`);
+      o+=`<g class="landmark" tabindex="0" role="button" data-place="${p.id}" aria-label="${p.name}，查看档案">${outline}`;
+      if(p.id==='hufflepuff')o+=`<ellipse cx="${cx}" cy="${y+h/2}" rx="${w/2-9}" ry="${h/2-9}" class="ink hair"/>`;else o+=rect(x+9,y+9,w-18,h-18,'ink hair');
+      o+=dungeonInterior(p,x,y,w,h);
+      const shortName=p.id==='slytherin'?'斯莱特林':p.id==='hufflepuff'?'赫奇帕奇':p.name;
+      o+=text(cx,y+h-28,shortName,'room-label')+text(cx,y+h-10,p.en,'room-en')+'</g>';
+      const [ax,ay,bx,by]=room.door;
+      o+=path(`M${ax} ${ay}L${bx} ${by}`,'door-opening');
+      if(p.id==='slytherin')o+=path(`M${ax} ${ay}h60m-53 -5h48m-47 10h46`,'ink hair','data-hidden-stone-wall="true"');
+      else o+=path(ax===bx?`M${ax} ${ay}h-35q0 35 35 35`:`M${ax} ${ay}v-35q35 0 35 35`,'ink hair');
+    }
+    // These two entrance symbols follow official descriptions; their exact
+    // coordinates are original guide reconstruction, not canonical door positions.
+    o+=`<g class="landmark" tabindex="0" role="button" data-place="kitchen" aria-label="查看水果画中的厨房入口" data-kitchen-fruit="true">${rect(938,472,30,64,'wash')}${rect(942,477,22,54,'ink hair')}`;
+    o+=path('M951 513q-12 2 -8 -10l6 -8q-2 -9 4 -10q6 2 4 10l6 8q4 12 -12 10ZM951 487l5 -6','ink hair')+'</g>';
+    o+=`<g class="landmark" tabindex="0" role="button" data-place="hufflepuff" aria-label="查看木桶后的赫奇帕奇入口" data-hufflepuff-barrels="true">`;
+    for(const [bx,by] of [[1180,744],[1212,744],[1244,744],[1196,766],[1228,766]])o+=`<ellipse cx="${bx}" cy="${by}" rx="14" ry="10" class="wash"/>`+path(`M${bx-12} ${by-4}h24m-24 8h24`,'ink hair');
+    o+='</g>'+text(1194,662,'厨房与木桶入口在同一条走廊','ground-caption');
+    o+=text(622,735,'口令石墙','ground-caption')+text(888,302,'往门厅','ground-caption');
+    for(let j=0;j<6;j++)o+=line(788,241+j*7,852,241+j*7,'ink hair');
+    o+=`<g class="landmark floor-index-link" tabindex="0" role="button" data-place="entrance" data-index-x="815" data-index-y="1048" aria-label="返回地面层门厅档案">${rect(650,1017,330,62,'clue-hit')}${text(815,1054,'回到地面层 · 门厅 ↗','clue-label')}</g>`;
+    o+=text(800,1090,'厨房与木桶入口同廊有官方依据 · 两翼、距离与门位为导览重建','small-label');
+    return {svg:o+'</g><g id="routes" class="routes"></g><g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:dungeonPlan};
+  }
   function greatHallInterior(x,y,w,h){let o='';
     o+=rect(x+25,y+25,w-50,62,'shade')+rect(x+35,y+84,w-70,9,'ink hair');
     o+=rect(x+45,y+38,w-90,22,'wash','data-teachers-table="true"');
@@ -226,8 +302,8 @@ window.MAPART = (() => {
     o+=path('M735 917h80M735 917v-23h39v23m2 0v-23h39v23','ink');
     o+=text(775,974,'橡木大门','floor-feature-label')+text(1188,929,'PUBLIC GALLERY','small-label');
     // These are archive/floor-index links, not invented physical passages.
-    o+=`<g class="landmark ground-index-link" tabindex="0" role="button" data-place="kitchen" data-index-x="1205" aria-label="翻到地下厨房档案">${rect(1040,975,330,62,'clue-hit')}${text(1205,1012,'楼下厨房 · 翻到地下 ↗','clue-label')}</g>`;
-    o+=`<g class="landmark ground-index-link" tabindex="0" role="button" data-place="history" data-index-x="375" aria-label="翻到一楼魔法史教室档案">${rect(210,975,330,62,'clue-hit')}${text(375,1012,'上一楼 · 魔法史 ↗','clue-label')}</g>`;
+    o+=`<g class="landmark ground-index-link floor-index-link" tabindex="0" role="button" data-place="kitchen" data-index-x="1205" aria-label="翻到地下厨房档案">${rect(1040,975,330,62,'clue-hit')}${text(1205,1012,'楼下厨房 · 翻到地下 ↗','clue-label')}</g>`;
+    o+=`<g class="landmark ground-index-link floor-index-link" tabindex="0" role="button" data-place="history" data-index-x="375" aria-label="翻到一楼魔法史教室档案">${rect(210,975,330,62,'clue-hit')}${text(375,1012,'上一楼 · 魔法史 ↗','clue-label')}</g>`;
     o+=text(800,1090,'门厅与礼堂连接有原著依据 · 庭院位置、比例与门位为导览重建','small-label');
     return {svg:o+'</g><g id="routes" class="routes"></g><g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:groundPlan};
   }
@@ -297,7 +373,7 @@ window.MAPART = (() => {
     [[1115,291],[1095,303],[1107,317],[1142,327],[1170,334]],
     [[826,688],[815,710],[804,738],[809,759],[830,777],[866,792],[906,816]]
   ];
-  function floor(f,era){if(f==='ground')return groundFloor();if(f==='third')return thirdFloor();if(f==='fourth')return fourthFloor(era);let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
+  function floor(f,era){if(f==='dungeon')return dungeonFloor();if(f==='ground')return groundFloor();if(f==='third')return thirdFloor();if(f==='fourth')return fourthFloor(era);let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
     o+=path('M185 214H1415V952H185ZM207 235H1392V930H207Z','shade','fill-rule="evenodd"');
     for(const c of floorPlan.corridors)o+=rect(...c,'wash');
     for(const [x,y] of [[205,242],[1395,242],[205,930],[1395,930]]){o+=circle(x,y,71,'shade')+circle(x,y,55,'ink');for(let i=0;i<18;i++){let a=i*Math.PI/9;o+=line(x+Math.cos(a)*20,y+Math.sin(a)*20,x+Math.cos(a)*53,y+Math.sin(a)*53,'ink hair')}o+=circle(x,y,19)}

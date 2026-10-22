@@ -77,5 +77,13 @@ window.ATLAS = (() => {
   places.find(p=>p.id==='entrance').details=['橡木大门、大理石楼梯与学院沙漏有原著线索','官方资料确认门厅与礼堂相连','庭院位置、回廊形状与门位为导览重建'];
   places.find(p=>p.id==='entrance').evidence=[{label:'官方礼堂资料：与门厅相连',url:S.hall}];
   places.find(p=>p.id==='great-hall').evidence=[{label:'官方礼堂资料',url:S.hall},{label:'官方厨房资料：位于礼堂下方',url:official+'fact-file/locations/hogwarts-kitchens'}];
+  const kitchenSource=official+'fact-file/locations/hogwarts-kitchens',hufflepuffSource=official+'writing-by-jk-rowling/hufflepuff-common-room';
+  places.find(p=>p.id==='kitchen').evidence=[{label:'官方厨房资料：水果画与楼上礼堂',url:kitchenSource}];
+  places.find(p=>p.id==='hufflepuff').evidence=[{label:'J.K. Rowling：木桶入口与公共休息室',url:hufflepuffSource}];
+  places.find(p=>p.id==='hufflepuff').details=['与厨房入口位于同一条走廊','按正确节奏敲木桶，入口后通往低矮圆室','圆窗、植物和木家具来自官方补充设定；位置为导览重建'];
+  places.find(p=>p.id==='slytherin').evidence=[{label:'官方斯莱特林公共休息室资料',url:official+'fact-file/locations/the-slytherin-common-room'}];
+  places.find(p=>p.id==='kitchen').nearby={hint:'厨房位于礼堂下方；继续沿同一条走廊，可以找到赫奇帕奇的木桶入口。',links:[{id:'great-hall',label:'楼上 · 礼堂'},{id:'hufflepuff',label:'同一走廊 · 赫奇帕奇入口'}]};
+  places.find(p=>p.id==='hufflepuff').nearby={hint:'木桶入口和厨房的水果画在同一条走廊，具体距离与门位为导览重建。',links:[{id:'kitchen',label:'回到水果画 · 厨房'}]};
+  places.find(p=>p.id==='great-hall').nearby={hint:'礼堂下方的厨房里，餐桌与楼上的餐桌对应。',links:[{id:'kitchen',label:'楼下 · 厨房'}]};
   return {places,floors,eras,sources:S,state,connections,mirrorComparison};
 })();

@@ -22,10 +22,25 @@ for (const [floor] of context.ATLAS.floors) for (const era of ['1976', '1993', '
       // Conservative 9.5-unit envelope contains either shoe + lateral step offset.
       for (const dx of [-9.5, 0, 9.5]) for (const dy of [-9.5, 0, 9.5]) {
         assert(plan.corridors.some(r => inRect(x + dx, y + dy, r)), `Footprint outside corridor: ${floor}/${era}/${x}/${y}`);
-        assert(!plan.cells.some(r => inRect(x + dx, y + dy, r)), `Patrol enters a room: ${floor}/${era}`);
+        assert(!plan.cells.some(r => inRect(x + dx, y + dy, r)), `Patrol enters a blocked area: ${floor}/${era}`);
       }
       samples++;
     }
+  }
+  if (floor === 'dungeon') {
+    for (const other of ['ground', 'third', 'fourth']) assert.notEqual(plan, art.planFor(other));
+    assert.notEqual(plan, art.floorPlan, 'Dungeons must not use the shared four-cell grid');
+    assert.equal(plan.rooms.length, 4);
+    for (const room of plan.rooms) {
+      const b = art.floor(floor, era).bounds.find(b => b.id === room.id), [x, y, w, h] = room.rect;
+      assert.equal(b.x, x + w / 2); assert.equal(b.y, y + h / 2);
+      assert.equal(b.w, w); assert.equal(b.h, h);
+    }
+    assert.equal((svg.match(/data-kitchen-table=/g) || []).length, 4);
+    for (const feature of ['data-potions-shelf', 'data-hidden-stone-wall', 'data-kitchen-fruit', 'data-hufflepuff-barrels']) assert(svg.includes(feature));
+    assert(svg.includes('data-place="entrance"'), 'The dungeon index can return to the actual ground-floor archive');
+    assert(svg.includes('厨房与木桶入口在同一条走廊'));
+    assert(!svg.includes('data-route="ariana"'));
   }
   if (floor === 'ground') {
     assert.notEqual(plan, art.floorPlan, 'Ground floor must not use the generic guide grid');
@@ -94,12 +109,20 @@ for (const c of context.ATLAS.connections) {
   assert.notEqual(c.ends[0], c.ends[1]);
   for (const id of c.ends) assert(context.ATLAS.places.some(p => p.id === id), `Dangling connection: ${c.id}/${id}`);
 }
+for (const p of context.ATLAS.places) for (const link of p.nearby?.links || []) {
+  assert.notEqual(p.id, link.id, 'Nearby archive links must not point to themselves');
+  assert(context.ATLAS.places.some(q => q.id === link.id), `Dangling nearby archive: ${p.id}/${link.id}`);
+}
+assert(context.ATLAS.places.find(p => p.id === 'kitchen').nearby.links.some(l => l.id === 'great-hall'));
+assert(context.ATLAS.places.find(p => p.id === 'great-hall').nearby.links.some(l => l.id === 'kitchen'));
+assert(context.ATLAS.places.find(p => p.id === 'hufflepuff').nearby.links.some(l => l.id === 'kitchen'));
 const app = readFileSync(new URL('../dist/app.js', import.meta.url), 'utf8');
 assert(app.includes('currentFloorPlan=r.plan'), 'Retain the plan used by the rendered floor');
 assert(app.includes(':currentFloorPlan.patrols'), 'Animate on that floor, not the default shared grid');
+assert(app.includes('detailWasOpen&&p'), 'Changing eras must respect an archive the visitor already closed');
 const mirror = context.ATLAS.places.find(p => p.id === 'mirror');
 assert(context.ATLAS.state(mirror, '1976').includes('未确认'), 'Do not claim the tunnel was confirmed usable in 1976');
 assert(context.ATLAS.state(mirror, '1993').includes('已坍塌'));
 assert(context.ATLAS.state(mirror, '1998').includes('修复'));
 assert.equal(context.ATLAS.places.find(p => p.id === 'library').evidence.length, 2);
-console.log(`OK: ${samples} floor-route samples across 10 floors × 3 eras, including both-shoe clearance; independent ground/third/fourth-floor plans, public hall/cloisters, archive endpoints and matching patrols; mirror inference/collapse states; village tracking excluded. Grounds traces require visual review, not blueprint proof.`);
+console.log(`OK: ${samples} floor-route samples across 10 floors × 3 eras, including both-shoe clearance; independent dungeon/ground/third/fourth-floor plans, public circulation and nearby archive links; mirror inference/collapse states; village tracking excluded. Grounds traces require visual review, not blueprint proof.`);

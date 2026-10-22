@@ -35,11 +35,13 @@ Character routes are illustrative animations, not canonical event replays. Hogsm
 
 ![Hogsmeade map](docs/images/hogsmeade.jpg)
 
-The ground, third and fourth floors have their own layouts. The ground floor includes the Entrance Hall, marble staircase, four House tables and courtyard cloisters. The third includes a statue alcove, display gallery and tapestry clues; the fourth includes library shelves, reading tables, the Restricted Section and mirror passage. The other seven floor groups still share a guide layout.
-
-![Independent ground-floor layout: cloisters, Entrance Hall, marble staircase and Great Hall](docs/images/ground-floor.jpg)
+The dungeons, ground, third and fourth floors have their own layouts. The dungeons include cauldron desks, the fruit painting, barrel entrance and two common rooms. The ground floor has the Entrance Hall, House tables and cloisters; the third has statue and tapestry clues; the fourth has the library, Restricted Section and mirror passage. The other six floor groups still share a guide layout. Linked records connect the kitchens, Great Hall above and nearby Hufflepuff entrance.
 
 <table>
+  <tr>
+    <td width="50%"><img src="docs/images/dungeon.jpg" alt="Independent dungeon layout with cauldrons, hidden stone wall, kitchens and barrels"><br>Dungeons: cauldrons, fruit painting and barrels</td>
+    <td width="50%"><img src="docs/images/ground-floor.jpg" alt="Independent ground-floor layout with cloisters, Entrance Hall and Great Hall"><br>Ground floor: Entrance Hall and Great Hall</td>
+  </tr>
   <tr>
     <td width="50%"><img src="docs/images/third-floor.jpg" alt="Third-floor statue alcove, gallery and tapestry shortcut"><br>Third floor: the One-Eyed Witch and tapestry clues</td>
     <td width="50%"><img src="docs/images/fourth-floor.jpg" alt="Fourth-floor library, Restricted Section and mirror passage"><br>Fourth floor: the library and mirror passage</td>
@@ -85,7 +87,7 @@ Start with `dist/data.js` for records, `dist/art.js` for floor geometry and rout
 npm run check
 ```
 
-Checks cover scripts, records, assets, animation and routes. The route check currently samples 94,503 positions across 10 floor groups × 3 eras, including clearance for both shoes. This tests internal consistency, not canonical geography or exhaustive real-device compatibility.
+Checks cover scripts, records, assets, animation and routes. The route check currently samples 94,728 positions across 10 floor groups × 3 eras, including clearance for both shoes. This tests internal consistency, not canonical geography or exhaustive real-device compatibility.
 
 Serve `dist/` as the site root. A manually triggered Pages workflow is included: select GitHub Actions under Settings → Pages, then run Actions → Deploy GitHub Pages. It uploads `dist/`; source pushes do not automatically publish a site. Branch-based Pages publishing only accepts the root or `/docs`, not `/dist`. See [GitHub’s documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 

@@ -37,11 +37,13 @@
 
 ![霍格莫德地图](docs/images/hogsmeade.jpg)
 
-城堡里，地面层、三楼和四楼已有独立布局。地面层有门厅、大理石楼梯、四张学院长桌与庭院回廊；三楼有雕像壁龛、陈列廊和挂毯线索；四楼有图书馆、阅览桌、禁书区与镜后旧路。其余七组仍使用共用导览布局。
-
-![地面层独立布局：庭院回廊、门厅、大理石楼梯和礼堂](docs/images/ground-floor.jpg)
+城堡里，地下、地面层、三楼和四楼已有独立布局。地下有坩埚课桌、水果画、木桶入口与两院休息室；地面层有门厅、礼堂长桌与庭院回廊；三楼有雕像、陈列廊和挂毯线索；四楼有图书馆、禁书区与镜后旧路。其余六组仍使用共用导览布局。厨房、楼上礼堂与赫奇帕奇入口的档案可以接着翻阅。
 
 <table>
+  <tr>
+    <td width="50%"><img src="docs/images/dungeon.jpg" alt="地下独立布局：魔药教室、石墙入口、厨房和木桶"><br>地下：坩埚、水果画与木桶入口</td>
+    <td width="50%"><img src="docs/images/ground-floor.jpg" alt="地面层独立布局：庭院回廊、门厅与礼堂"><br>地面层：从门厅到礼堂</td>
+  </tr>
   <tr>
     <td width="50%"><img src="docs/images/third-floor.jpg" alt="三楼布局：雕像壁龛、陈列廊与挂毯捷径"><br>三楼：独眼女巫与挂毯线索</td>
     <td width="50%"><img src="docs/images/fourth-floor.jpg" alt="四楼布局：图书馆、禁书区与镜后旧路"><br>四楼：图书馆与镜后旧路</td>
@@ -93,7 +95,7 @@ docs/                           制作记录、资料依据与截图
 npm run check
 ```
 
-检查覆盖脚本、档案、资源、动画与路线。目前路线检查包含 10 组楼层 × 3 个年代，采样 94,503 个路径位置并检查双脚余量。它验证项目内部的一致性，不证明原著空间准确，也不替代真实设备测试。
+检查覆盖脚本、档案、资源、动画与路线。目前路线检查包含 10 组楼层 × 3 个年代，采样 94,728 个路径位置并检查双脚余量。它验证项目内部的一致性，不证明原著空间准确，也不替代真实设备测试。
 
 部署时将 `dist/` 作为静态站点根目录。仓库已附手动触发的 Pages 工作流：Settings → Pages 选择 GitHub Actions，再运行 Actions → Deploy GitHub Pages。工作流会上传 `dist/`；推送源码不会自动发布站点。GitHub 的分支部署只能选根目录或 `/docs`，不能直接选 `/dist`。见[官方说明](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)。
 
