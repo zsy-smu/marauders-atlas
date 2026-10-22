@@ -82,6 +82,10 @@ html{overflow:hidden}.workspace{overflow:hidden}.detail-toolbar>span{display:non
 .floor-feature-label{font:14px var(--serif);fill:#70513a;text-anchor:middle;paint-order:stroke;stroke:#ded4bc;stroke-width:3px;stroke-linejoin:round}
 .ground-walk{fill:#d4cdb6;stroke:none}
 .ground-floor .room-label,.dungeon-floor .room-label{font-size:30px}
+.seventh-floor .room-label{font-size:29px}.blind-wall{fill:url(#stone);stroke:none}
+.blind-question{font:italic 76px Georgia;fill:#785a3d;text-anchor:middle;opacity:.75}
+.blind-note:focus-visible .blind-wall,.blind-note:hover .blind-wall,.blind-note.selected .blind-wall{stroke:#843d27;stroke-width:2}
+.portrait-clue:focus-visible .clue-hit,.portrait-clue:hover .clue-hit,.tapestry-clue:focus-visible .clue-hit,.tapestry-clue:hover .clue-hit{stroke:#843d27;stroke-width:2;fill:#8c593b15}
 .ground-garden{fill:url(#dots);stroke:#71664d;stroke-width:1.4}
 .ground-caption{font:13px var(--serif);fill:#716047;text-anchor:middle;paint-order:stroke;stroke:#ded4bc;stroke-width:2px}
 .floor-index-link:focus-visible .clue-hit,.floor-index-link:hover .clue-hit{fill:#8c593b22;stroke:#843d27;stroke-width:2}

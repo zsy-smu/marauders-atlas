@@ -19,7 +19,7 @@ The live demo needs no sign-in. You can also download the source and run it loca
 Open the cover to reveal the ink. Pan and zoom, then select a building or directory entry to read its record. Switch between the grounds, castle and Hogsmeade; linked passage records let you visit both ends.
 
 - **Look for Filch.** The 1993–94 character group includes an illustrative patrol. Left and right footprints stay where they land, then gradually wear away. Pausing also stops their fading.
-- **Find the Room of Requirement.** Its marker remains a question mark, and its record explains why the map cannot reveal the people inside.
+- **Find the Room of Requirement note.** The seventh floor draws a tapestry and blank wall, not the hidden room's interior. The question mark is this atlas's margin note, not a room plotted on the original map. No occupants are shown inside.
 - **Compare passage records across eras.** The mirror passage is marked as collapsed in 1993–94. Its 1976 view is conjectural, not evidence of access that year. The 1998 records also include the Ariana portrait passage.
 - **Follow the One-Eyed Witch to Honeydukes.** The third-floor record links to the cellar record in the Hogsmeade volume, with a link back.
 
@@ -35,7 +35,7 @@ Character routes are illustrative animations, not canonical event replays. Hogsm
 
 ![Hogsmeade map](docs/images/hogsmeade.jpg)
 
-The dungeons, ground, third and fourth floors have their own layouts. The dungeons include cauldron desks, the fruit painting, barrel entrance and two common rooms. The ground floor has the Entrance Hall, House tables and cloisters; the third has statue and tapestry clues; the fourth has the library, Restricted Section and mirror passage. The other six floor groups still share a guide layout. Linked records connect the kitchens, Great Hall above and nearby Hufflepuff entrance.
+The dungeons, ground, third, fourth and seventh floors have their own layouts. The dungeons include cauldron desks, the fruit painting, barrel entrance and two common rooms. The ground floor has the Entrance Hall, House tables and cloisters; the third has statue and tapestry clues; the fourth has the library, Restricted Section and mirror passage. The seventh has a circular common room, the Fat Lady portrait, a tapestry and the blank wall opposite it, preserving the Room of Requirement's map blind spot. The other five floor groups still share a guide layout.
 
 <table>
   <tr>
@@ -47,6 +47,8 @@ The dungeons, ground, third and fourth floors have their own layouts. The dungeo
     <td width="50%"><img src="docs/images/fourth-floor.jpg" alt="Fourth-floor library, Restricted Section and mirror passage"><br>Fourth floor: the library and mirror passage</td>
   </tr>
 </table>
+
+![Seventh floor: circular common room, portrait entrance, tapestry and blank wall, without a Room of Requirement interior](docs/images/seventh-floor.jpg)
 
 On phones, a directory helps locate places and records open in a separately scrolling lower panel. This screenshot shows the fourth-floor era comparison:
 
@@ -87,7 +89,7 @@ Start with `dist/data.js` for records, `dist/art.js` for floor geometry and rout
 npm run check
 ```
 
-Checks cover scripts, records, assets, animation and routes. The route check currently samples 94,728 positions across 10 floor groups × 3 eras, including clearance for both shoes. This tests internal consistency, not canonical geography or exhaustive real-device compatibility.
+Checks cover scripts, records, assets, animation and routes. The route check currently samples 94,815 positions across 10 floor groups × 3 eras, including clearance for both shoes, and ensures the seventh-floor blind spot is not drawn as a room. This tests internal consistency, not canonical geography or exhaustive real-device compatibility.
 
 Serve `dist/` as the site root. A manually triggered Pages workflow is included: select GitHub Actions under Settings → Pages, then run Actions → Deploy GitHub Pages. It uploads `dist/`; source pushes do not automatically publish a site. Branch-based Pages publishing only accepts the root or `/docs`, not `/dist`. See [GitHub’s documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 

@@ -96,7 +96,29 @@ for (const [floor] of context.ATLAS.floors) for (const era of ['1976', '1993', '
     assert(svg.includes('M395 330'), 'The outbound passage begins at the actual statue niche');
     assert(svg.includes('1991—92 年历史地点 · 当前不放置路威'), 'Keep the guard as a historical note, not a current character');
   }
-  if (floor === 'seventh') assert.equal(svg.includes('data-route="ariana"'), era === '1998');
+  if (floor === 'seventh') {
+    assert.notEqual(plan, art.floorPlan, 'Seventh floor needs its own public circulation');
+    for (const other of ['dungeon','ground','third','fourth']) assert.notEqual(plan, art.planFor(other));
+    assert.equal(plan.rooms.length, 1, 'Only the common room is a mapped room');
+    assert.equal(plan.notes.length, 1, 'The Requirement record is a margin note');
+    const bounds = art.floor(floor, era).bounds;
+    for (const item of [...plan.rooms, ...plan.notes]) {
+      const b = bounds.find(b => b.id === item.id), [x,y,w,h] = item.rect;
+      assert.equal(b.x,x+w/2); assert.equal(b.y,y+h/2);
+      assert.equal(b.w,w); assert.equal(b.h,h);
+    }
+    assert(!svg.includes('data-room="requirement"'), 'Never draw an interior for the map blind spot');
+    assert(!plan.rooms.some(r => r.id === 'requirement'));
+    for (const marker of ['data-fat-lady-portrait','data-gryffindor-hearth','data-barnabas-tapestry','data-blank-wall','data-blind-note']) assert(svg.includes(marker));
+    assert.equal((svg.match(/data-gryffindor-chair=/g)||[]).length,4);
+    assert(plan.tapestry[1]+plan.tapestry[3] < plan.corridors[2][1]);
+    assert(plan.blankWall[1] > plan.corridors[2][1]+plan.corridors[2][3], 'Tapestry and blank wall face across a corridor');
+    assert.equal(svg.includes('data-route="ariana"'), era === '1998');
+    assert.equal(svg.includes('data-route-trigger="ariana"'), era === '1998');
+    assert.equal(svg.includes('data-ariana-note="true"'), era === '1998');
+    assert(svg.includes('data-place="boys-bathroom"'));
+    assert(context.ATLAS.state(context.ATLAS.places.find(p=>p.id==='requirement'),era).includes('盲区'), 'Ariana state must not hide the blind-spot boundary');
+  }
 }
 assert.equal(art.groundsPatrols.length, 2);
 for (const route of art.groundsPatrols) {
@@ -125,4 +147,4 @@ assert(context.ATLAS.state(mirror, '1976').includes('未确认'), 'Do not claim 
 assert(context.ATLAS.state(mirror, '1993').includes('已坍塌'));
 assert(context.ATLAS.state(mirror, '1998').includes('修复'));
 assert.equal(context.ATLAS.places.find(p => p.id === 'library').evidence.length, 2);
-console.log(`OK: ${samples} floor-route samples across 10 floors × 3 eras, including both-shoe clearance; independent dungeon/ground/third/fourth-floor plans, public circulation and nearby archive links; mirror inference/collapse states; village tracking excluded. Grounds traces require visual review, not blueprint proof.`);
+console.log(`OK: ${samples} floor-route samples across 10 floors × 3 eras, including both-shoe clearance; five independent plans; seventh-floor blind spot without an interior and 1998-only Ariana note; public circulation and archive links; mirror inference/collapse states; village tracking excluded. Grounds traces require visual review, not blueprint proof.`);

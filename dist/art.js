@@ -176,7 +176,20 @@ window.MAPART = (() => {
       [[620,720],[620,640],[835,640],[835,700],[1130,700],[1130,755]]]
   };
   dungeonPlan.cells=[...dungeonPlan.rooms.map(room=>room.rect),dungeonPlan.fruitFrame,dungeonPlan.barrels];
-  const planFor=f=>f==='dungeon'?dungeonPlan:f==='ground'?groundPlan:f==='third'?thirdPlan:f==='fourth'?fourthPlan:floorPlan;
+  // The Requirement record is a margin note, not a mapped room. Its rectangle
+  // is only a focus/hit region; it must never become a floor cell or a doorway.
+  const seventhPlan={
+    rooms:[{id:'gryffindor',rect:[195,275,470,470],door:[665,470,665,550]}],
+    notes:[{id:'requirement',rect:[1000,710,400,160]}],
+    corridors:[[665,470,240,80],[825,270,80,650],[825,610,590,90],[825,840,300,80]],
+    portrait:[645,458,50,100],tapestry:[1060,515,270,65],blankWall:[1000,710,400,30],stairs:[[843,273,44,44],[1057,852,56,56]],
+    patrols:[[[865,345],[865,880],[1035,880]],
+      [[1380,640],[845,640],[845,330]],
+      [[745,510],[885,510],[885,670],[1375,670]],
+      [[1010,860],[875,860],[875,495],[735,495]]]
+  };
+  seventhPlan.cells=[seventhPlan.rooms[0].rect,seventhPlan.portrait,seventhPlan.tapestry,seventhPlan.blankWall,...seventhPlan.stairs];
+  const planFor=f=>f==='dungeon'?dungeonPlan:f==='ground'?groundPlan:f==='third'?thirdPlan:f==='fourth'?fourthPlan:f==='seventh'?seventhPlan:floorPlan;
   function dungeonInterior(p,x,y,w,h){let o='';
     if(p.id==='potions'){
       o+=rect(x+22,y+17,w-44,25,'shade','data-potions-shelf="true"');
@@ -367,13 +380,54 @@ window.MAPART = (() => {
     o+=text(800,1040,'同层收录不表示相邻 · 书架、门位、距离与走廊为导览重建','small-label floor-boundary-note');
     return {svg:o+'<g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:fourthPlan};
   }
+  function seventhFloor(era){let o=defs+'<g class="seventh-floor">',bounds=[];
+    o+=path('M185 255H690V450H805V250H925V590H1435V720H925V820H1145V940H805V570H690V775H185Z','shade');
+    for(const c of seventhPlan.corridors)o+=rect(...c,'ground-walk');
+    o+=path('M695 470H825V270H905V610H1415V700H905V840H1125V920H825V550H695','ink');
+    o+=line(825,550,825,610)+line(905,700,905,840);
+    const room=seventhPlan.rooms[0],[x,y,w,h]=room.rect,cx=x+w/2,cy=y+h/2;
+    bounds.push({id:room.id,x:cx,y:cy,w,h});
+    o+=`<g class="landmark" role="button" tabindex="0" data-place="gryffindor" aria-label="格兰芬多公共休息室，查看档案"><circle cx="${cx}" cy="${cy}" r="235" class="map-room" data-room="gryffindor"/>${circle(cx,cy,223,'ink hair')}`;
+    for(const a of [205,235,265,295,325,145]){const angle=a*Math.PI/180,wx=cx+Math.cos(angle)*228,wy=cy+Math.sin(angle)*228;o+=`<g transform="translate(${wx} ${wy}) rotate(${a+90})">${rect(-19,-6,38,12,'wash')}${line(-12,0,12,0)}</g>`}
+    // A circular sitting room; no invented dormitory rooms behind the spiral.
+    o+=rect(cx-72,y+34,144,34,'shade','data-gryffindor-hearth="true"')+rect(cx-58,y+44,116,30,'ink hair');
+    for(let j=0;j<5;j++)o+=path(`M${cx-40+j*20} ${y+66}q-8 -9 0 -17q8 8 0 17`,'ink hair');
+    o+=circle(cx,cy-18,104,'ink hair')+circle(cx,cy-18,97,'ink hair')+circle(cx,cy-18,43,'wash');
+    o+=path(`M${cx-22} ${cy-29}q11 -5 22 0q11 -5 22 0v26q-11 -5 -22 0q-11 -5 -22 0ZM${cx} ${cy-29}v26`,'ink hair');
+    for(const [sx,sy,a] of [[cx-151,cy-60,90],[cx+107,cy-60,-90],[cx-75,cy+75,0],[cx+25,cy+75,0]]){
+      o+=`<g transform="translate(${sx} ${sy}) rotate(${a} 25 17)" data-gryffindor-chair="true">${rect(0,0,50,34,'wash','rx="7"')}${rect(5,6,40,22,'ink hair','rx="4"')}${line(5,34,5,41)}${line(45,34,45,41)}</g>`;
+    }
+    o+=circle(305,625,40,'wash')+circle(305,625,10,'ink hair');
+    for(let j=0;j<11;j++){const a=j*Math.PI/6;o+=line(305+Math.cos(a)*11,625+Math.sin(a)*11,305+Math.cos(a)*36,625+Math.sin(a)*36,'ink hair')}
+    o+=text(445,640,'寝室旋梯','floor-feature-label')+text(cx,697,'格兰芬多公共休息室','room-label')+text(cx,719,'GRYFFINDOR TOWER','room-en')+'</g>';
+    // A password portrait, not an open gate for every illustrative patrol.
+    o+=path('M665 470V550','door-opening');
+    o+=`<g class="landmark portrait-clue" role="button" tabindex="0" data-place="gryffindor" aria-label="查看胖夫人肖像入口" data-fat-lady-portrait="true" data-feature-hit="true">${rect(635,445,70,126,'clue-hit')}${rect(...seventhPlan.portrait,'shade')}${rect(651,464,38,88,'wash')}${circle(670,488,9,'ink hair')}${path('M655 537q-1 -28 15 -32q16 4 15 32ZM660 478q10 -10 20 0M656 542h28','ink hair')}</g>`;
+    o+=text(735,430,'肖像入口','floor-feature-label');
+    // The tapestry is opposite the blank wall, not a secret passage itself.
+    o+=`<g class="landmark tapestry-clue" role="button" tabindex="0" data-place="requirement" aria-label="查看疯子巴拿巴挂毯线索" data-barnabas-tapestry="true" data-feature-hit="true">${rect(1045,500,300,95,'clue-hit')}${rect(...seventhPlan.tapestry,'wash')}${rect(1067,522,256,51,'ink hair')}`;
+    for(let j=0;j<3;j++){const tx=1100+j*82;o+=circle(tx,534,7,'ink hair')+path(`M${tx-9} 546q9 -7 18 0l-4 13h-10ZM${tx-8} 542l-14 -11m32 11l14 -11M${tx-3} 559l-12 11m18 -11l12 11`,'ink hair')}
+    o+=line(1070,511,1320,511)+text(1195,485,'疯子巴拿巴挂毯','floor-feature-label')+'</g>';
+    for(let j=0;j<15;j++)o+=rect(930+j*31,618,4,4,'ink hair')+rect(930+j*31,687,4,4,'ink hair');
+    const note=seventhPlan.notes[0];bounds.push({id:note.id,x:1200,y:790,w:400,h:160});
+    o+=`<g class="landmark blind-note floor-index-link" role="button" tabindex="0" data-place="requirement" data-index-x="1200" data-index-y="814" aria-label="查看有求必应屋盲区札记" data-blind-note="true">${rect(...seventhPlan.blankWall,'blind-wall','data-blank-wall="true"')}${line(1000,710,1400,710)}${rect(1000,774,400,80,'clue-hit')}${text(1200,792,'?','blind-question')}${text(1200,832,'有求必应屋 ↗','clue-label')}</g>`;
+    o+=text(1200,890,'图外札记 · 原图盲区','floor-feature-label')+text(1200,940,'屋内不测绘、不追踪','floor-feature-label');
+    o+=text(765,775,'七楼公共走廊','small-label','transform="rotate(-90 765 775)"');
+    o+=circle(865,295,22,'ink hair');for(let j=0;j<6;j++)o+=line(851+j,285+j*4,879-j,285+j*4,'ink hair');
+    o+=circle(1085,880,28,'ink hair');for(let j=0;j<6;j++)o+=line(1067+j,870+j*4,1103-j,870+j*4,'ink hair');
+    o+=`<g class="landmark floor-index-link" role="button" tabindex="0" data-place="boys-bathroom" data-index-x="435" data-index-y="945" aria-label="翻到六楼男生盥洗室档案">${rect(270,914,330,62,'clue-hit')}${text(435,951,'下一层 · 六楼盥洗室 ↗','clue-label')}</g>`;
+    o+='</g><g id="routes" class="routes">';
+    if(era==='1998')o+=path('M1400 790H1480V400H1415','route supplement','data-route="ariana" data-ariana-note="true"')+`<g class="passage-clue" role="button" tabindex="0" data-route-trigger="ariana" data-clue-x="1200" data-clue-y="350" aria-label="查看1998年阿利安娜通道附注">${rect(1070,306,260,88,'clue-hit')}${text(1200,356,'1998 · 通道附注 ↗','clue-label')}</g>`;
+    o+='</g>'+text(800,1030,'挂毯与墙面相对有依据 · 翼廊、距离、家具位置为导览重建','small-label floor-boundary-note');
+    return {svg:o+'<g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:seventhPlan};
+  }
   // Short sections traced against visible paths in our own grounds illustration.
   // Do not extrapolate paths behind perspective buildings, into the lake or village.
   const groundsPatrols=[
     [[1115,291],[1095,303],[1107,317],[1142,327],[1170,334]],
     [[826,688],[815,710],[804,738],[809,759],[830,777],[866,792],[906,816]]
   ];
-  function floor(f,era){if(f==='dungeon')return dungeonFloor();if(f==='ground')return groundFloor();if(f==='third')return thirdFloor();if(f==='fourth')return fourthFloor(era);let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
+  function floor(f,era){if(f==='dungeon')return dungeonFloor();if(f==='ground')return groundFloor();if(f==='third')return thirdFloor();if(f==='fourth')return fourthFloor(era);if(f==='seventh')return seventhFloor(era);let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
     o+=path('M185 214H1415V952H185ZM207 235H1392V930H207Z','shade','fill-rule="evenodd"');
     for(const c of floorPlan.corridors)o+=rect(...c,'wash');
     for(const [x,y] of [[205,242],[1395,242],[205,930],[1395,930]]){o+=circle(x,y,71,'shade')+circle(x,y,55,'ink');for(let i=0;i<18;i++){let a=i*Math.PI/9;o+=line(x+Math.cos(a)*20,y+Math.sin(a)*20,x+Math.cos(a)*53,y+Math.sin(a)*53,'ink hair')}o+=circle(x,y,19)}
@@ -387,7 +441,6 @@ window.MAPART = (() => {
     for(let i=0;i<16;i++)for(const y of [591,639])o+=rect(330+i*63,y,5,4,'ink hair');o+=text(1140,680,'CORRIDOR','small-label')+text(735,871,'旋转楼梯','small-label','transform="rotate(-90 735 871)"');
     o+=`<g transform="translate(800 614)">${circle(0,0,36)}${path('M-24 -5h48m-45 7h42m-36 7h30m-25 7h20','ink hair')}</g>`;
     o+=`<g id="routes" class="routes">`;
-    if(f==='seventh'&&era==='1998')o+=path('M1090 300Q1191 188 1450 177','route supplement','data-route="ariana"')+text(1305,146,'1998 年附加札记','small-label');
     o+=`</g><g id="people"></g><g id="selectedOverlay"></g>`;return {svg:o,bounds,plan:floorPlan};
   }
   function illustratedWorld(era){let o=defs+'<image href="assets/world-engraving.png" x="0" y="0" width="2400" height="1500" preserveAspectRatio="none"/>';
