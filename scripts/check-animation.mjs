@@ -16,7 +16,8 @@ const person = {
   speed: 24, spacing: 14, offset: 0.22, scale: 1, width: 82, label: element(),
   stamps: Array.from({ length: 26 }, () => ({ el: element(), ink: element(), step: null, wear: null })),
 };
-const context = vm.createContext({ people: [person], labelObstacles: [], simTime: 20, footprintLife: 14, canvas: { clientWidth: 1000 }, box: { x: -500, y: -500, w: 2000, h: 2000 } });
+const context = vm.createContext({ people: [person], labelObstacles: [], simTime: 20, footprintLife: 14, canvas: { clientWidth: 1000 }, box: { x: -500, y: -500, w: 2000, h: 2000 }, setPersonName() {} });
+vm.runInContext(readFileSync(new URL('../dist/reading.js', import.meta.url), 'utf8').replace('window.MAPREAD', 'MAPREAD'), context);
 vm.runInContext(source.slice(start, end), context);
 const point = distance => context.pointOn(person, distance);
 assert.equal(point(25).x, 25);

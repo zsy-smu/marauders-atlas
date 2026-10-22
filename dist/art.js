@@ -237,7 +237,7 @@ window.MAPART = (() => {
     o+=text(622,735,'口令石墙','ground-caption')+text(888,302,'往门厅','ground-caption');
     for(let j=0;j<6;j++)o+=line(788,241+j*7,852,241+j*7,'ink hair');
     o+=`<g class="landmark floor-index-link" tabindex="0" role="button" data-place="entrance" data-index-x="815" data-index-y="1048" aria-label="返回地面层门厅档案">${rect(650,1017,330,62,'clue-hit')}${text(815,1054,'回到地面层 · 门厅 ↗','clue-label')}</g>`;
-    o+=text(800,1090,'厨房与木桶入口同廊有官方依据 · 两翼、距离与门位为导览重建','small-label');
+    o+=text(800,1090,'厨房与木桶入口同廊有官方依据 · 两翼、距离与门位为导览重建','small-label floor-boundary-note');
     return {svg:o+'</g><g id="routes" class="routes"></g><g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:dungeonPlan};
   }
   function greatHallInterior(x,y,w,h){let o='';
@@ -304,7 +304,7 @@ window.MAPART = (() => {
     // These are archive/floor-index links, not invented physical passages.
     o+=`<g class="landmark ground-index-link floor-index-link" tabindex="0" role="button" data-place="kitchen" data-index-x="1205" aria-label="翻到地下厨房档案">${rect(1040,975,330,62,'clue-hit')}${text(1205,1012,'楼下厨房 · 翻到地下 ↗','clue-label')}</g>`;
     o+=`<g class="landmark ground-index-link floor-index-link" tabindex="0" role="button" data-place="history" data-index-x="375" aria-label="翻到一楼魔法史教室档案">${rect(210,975,330,62,'clue-hit')}${text(375,1012,'上一楼 · 魔法史 ↗','clue-label')}</g>`;
-    o+=text(800,1090,'门厅与礼堂连接有原著依据 · 庭院位置、比例与门位为导览重建','small-label');
+    o+=text(800,1090,'门厅与礼堂连接有原著依据 · 庭院位置、比例与门位为导览重建','small-label floor-boundary-note');
     return {svg:o+'</g><g id="routes" class="routes"></g><g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:groundPlan};
   }
   function thirdFloor(){let o=defs,bounds=[];
@@ -329,7 +329,7 @@ window.MAPART = (() => {
     for(const [sx,sy] of [[590,282],[1310,948]]){o+=circle(sx,sy,30,'wash');for(let j=0;j<6;j++)o+=line(sx-20+j*2,sy-12+j*5,sx+20-j*2,sy-12+j*5,'ink hair')}
     o+=`<g id="routes" class="routes">${path('M730 432H692V672H844V780H880','route','data-route="tapestry"')}${path('M395 330V255Q360 230 265 230H145','route','data-route="witch-honey"')}</g>`;
     o+=`<g class="passage-clue" role="button" tabindex="0" data-route-trigger="tapestry" aria-label="展开挂毯捷径，查看奖品陈列室与魔咒课走廊两端">${rect(651,648,180,88,'clue-hit')}${path('M727 415h9v37h-9m-5 -35v32m17 -32v32','ink hair')}${text(741,692,'挂毯捷径 ↗','clue-label')}</g>`;
-    o+=text(205,213,'通往蜂蜜公爵地窖 ↗','clue-label')+text(800,1040,'连接关系有原著依据 · 翼廊、门位与路径曲折为导览重建','small-label');
+    o+=text(205,213,'通往蜂蜜公爵地窖 ↗','clue-label')+text(800,1040,'连接关系有原著依据 · 翼廊、门位与路径曲折为导览重建','small-label floor-boundary-note');
     return {svg:o+'<g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:thirdPlan};
   }
   function libraryInterior(x,y,w,h){let o='';
@@ -364,7 +364,7 @@ window.MAPART = (() => {
     if(!earlier){o+=`<g class="rubble" aria-hidden="true">`;for(const [x,y,r] of [[1322,242,12],[1336,254,10],[1311,256,9],[1338,235,8]])o+=path(`M${x-r} ${y}l${r*.6} ${-r} ${r} 2 ${r*.4} ${r} ${-r} ${r*.6}Z`,'shade');o+=path('M1311 226l32 35m-30 -1l29 -33','ink')+'</g>'}
     o+='</g>'+text(1460,224,'? 出口未详','small-label');
     o+=`<g class="passage-clue" tabindex="0" role="button" data-route-trigger="mirror" data-clue-x="1255" data-clue-y="616" aria-label="对照镜后旧密道的年代状态">${rect(1165,572,180,88,'clue-hit')}${text(1255,616,'对照年代 ↗','clue-label')}</g>`;
-    o+=text(800,1040,'同层收录不表示相邻 · 书架、门位、距离与走廊为导览重建','small-label');
+    o+=text(800,1040,'同层收录不表示相邻 · 书架、门位、距离与走廊为导览重建','small-label floor-boundary-note');
     return {svg:o+'<g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:fourthPlan};
   }
   // Short sections traced against visible paths in our own grounds illustration.
@@ -377,7 +377,7 @@ window.MAPART = (() => {
     o+=path('M185 214H1415V952H185ZM207 235H1392V930H207Z','shade','fill-rule="evenodd"');
     for(const c of floorPlan.corridors)o+=rect(...c,'wash');
     for(const [x,y] of [[205,242],[1395,242],[205,930],[1395,930]]){o+=circle(x,y,71,'shade')+circle(x,y,55,'ink');for(let i=0;i<18;i++){let a=i*Math.PI/9;o+=line(x+Math.cos(a)*20,y+Math.sin(a)*20,x+Math.cos(a)*53,y+Math.sin(a)*53,'ink hair')}o+=circle(x,y,19)}
-    o+=text(800,172,ATLAS.floors.find(x=>x[0]===f)[2],'region-title')+text(800,1040,'房间与通行关系为导览重建 · 空白房间不附会名称','small-label');
+    o+=text(800,172,ATLAS.floors.find(x=>x[0]===f)[2],'region-title')+text(800,1040,'房间与通行关系为导览重建 · 空白房间不附会名称','small-label floor-boundary-note');
     const cells=floorPlan.cells;
     for(let i=0;i<cells.length;i++){const [x,y,w,h]=cells[i],p=rooms[i];if(!p){o+=rect(x,y,w,h,'shade')+rect(x+11,y+11,w-22,h-22,'ink hair');o+=path(`M${x+21} ${y+22}h${w-42}v${h-44}H${x+21}Z`,'ink hair','style="stroke-dasharray:3 9;opacity:.25"');continue}
       const cx=x+w/2,cy=y+h/2; bounds.push({id:p.id,x:cx,y:cy,w,h});o+=`<g class="landmark" tabindex="0" role="button" data-place="${p.id}" aria-label="${p.name}，查看档案">${rect(x,y,w,h,'map-room',`data-room="${p.id}"`)}${rect(x+8,y+8,w-16,h-16,'ink hair')}${furniture(p,x,y,w,h)}${text(cx,y+h-26,p.name,'room-label')}${text(cx,y+h-9,p.en,'room-en')}${p.blind?text(cx,y+24,'此处为图外附注 · 不显示屋内人物','room-tag'):''}</g>`;
