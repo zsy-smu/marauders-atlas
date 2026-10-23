@@ -96,6 +96,28 @@ for (const [floor] of context.ATLAS.floors) for (const era of ['1976', '1993', '
     assert(svg.includes('M395 330'), 'The outbound passage begins at the actual statue niche');
     assert(svg.includes('1991—92 年历史地点 · 当前不放置路威'), 'Keep the guard as a historical note, not a current character');
   }
+  if (floor === 'fifth') {
+    assert.notEqual(plan,art.floorPlan,'Fifth floor needs its own layout');
+    for (const other of ['dungeon','ground','third','fourth','seventh']) assert.notEqual(plan,art.planFor(other));
+    assert.equal(plan.rooms.length,1,'Do not invent rooms behind the other doors');
+    assert.equal(plan.rooms[0].id,'prefect-bath');
+    const b=art.floor(floor,era).bounds[0],[x,y,w,h]=plan.rooms[0].rect;
+    assert.equal(b.x,x+w/2); assert.equal(b.y,y+h/2); assert.equal(b.w,w); assert.equal(b.h,h);
+    assert.equal((svg.match(/data-address-door=/g)||[]).length,4);
+    for(let number=1;number<4;number++) assert(plan.doors.find(d=>d.number===number).x>plan.doors.find(d=>d.number===number+1).x,'Door four is the fourth to the statue\'s left');
+    assert(plan.boris[0]>plan.doors[0].x);
+    for(const feature of ['data-prefect-pool','data-mermaid-portrait','data-bath-entry','data-boris-statue','data-diving-board']) assert(svg.includes(feature));
+    assert((svg.match(/data-bath-tap=/g)||[]).length>=40,'A reduced field of engraved tap symbols');
+    assert.equal((svg.match(/data-bath-towel=/g)||[]).length,4);
+    assert.equal((svg.match(/data-room=/g)||[]).length,1);
+    assert(svg.includes('data-place="myrtle"'));
+    assert(!svg.includes('data-route='),'A story link must not become a fabricated secret passage');
+    const p=context.ATLAS.places.find(p=>p.id==='prefect-bath');
+    assert(context.ATLAS.state(p,era).includes('1994—95'));
+    assert(context.ATLAS.state(p,era).includes(era==='1998'?'未确认':'晚于所选年代'));
+    assert(p.nearby.links.some(l=>l.id==='myrtle'));
+    assert(context.ATLAS.places.find(p=>p.id==='myrtle').nearby.links.some(l=>l.id==='prefect-bath'));
+  }
   if (floor === 'seventh') {
     assert.notEqual(plan, art.floorPlan, 'Seventh floor needs its own public circulation');
     for (const other of ['dungeon','ground','third','fourth']) assert.notEqual(plan, art.planFor(other));
@@ -147,4 +169,4 @@ assert(context.ATLAS.state(mirror, '1976').includes('未确认'), 'Do not claim 
 assert(context.ATLAS.state(mirror, '1993').includes('已坍塌'));
 assert(context.ATLAS.state(mirror, '1998').includes('修复'));
 assert.equal(context.ATLAS.places.find(p => p.id === 'library').evidence.length, 2);
-console.log(`OK: ${samples} floor-route samples across 10 floors × 3 eras, including both-shoe clearance; five independent plans; seventh-floor blind spot without an interior and 1998-only Ariana note; public circulation and archive links; mirror inference/collapse states; village tracking excluded. Grounds traces require visual review, not blueprint proof.`);
+console.log(`OK: ${samples} floor-route samples across 10 floors × 3 eras, including both-shoe clearance; six independent plans; fifth-floor four-door address and dated Golden Egg story; seventh-floor blind spot and 1998-only Ariana note; archive links; mirror inference/collapse states; village tracking excluded. Grounds traces require visual review, not blueprint proof.`);

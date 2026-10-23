@@ -72,6 +72,7 @@ window.ATLAS = (() => {
     if(p.id==='mirror')return era==='1976'?'较早年代重建：按坍塌前示意，1976 年可通行性未确认':era==='1993'?'1993—94：已坍塌，不能通行；原著未明确出口':'沿用已知坍塌记录；未确认 1998 年曾修复，出口仍未详';
     if(p.id==='cave')return era==='1993'?'小天狼星1995年藏身事件尚未发生':era==='1976'?'山洞存在；此期用途未明':'可查看1995年及后来的藏身记录';
     if(p.id==='forbidden-corridor')return '历史地点：三头犬与魔法石关卡属于1991—92学年';
+    if(p.id==='prefect-bath')return era==='1998'?'回望1994—95学年的金蛋线索；未确认1998年的当前口令。':'金蛋线索发生于1994—95学年，晚于所选年代；口令只作那次事件的记录。';
     return era==='1976'?'掠夺者时期 · 地点示意':era==='1998'?'1998年 · 事件见档案，未确认的经营状态不作断言':'1993—94学年 · 地点示意';
   }
   const connections=[
@@ -101,5 +102,12 @@ window.ATLAS = (() => {
   requirement.evidence=[{label:'官方资料：七楼、挂毯与墙前来回三次',url:S.requirement},{label:'官方隐秘空间专题：猪头酒吧通道',url:S.secrets}];
   gryffindor.nearby={hint:'继续翻阅七楼的另一份档案。两处同层收录，不表示原著确认它们相邻。',links:[{id:'requirement',label:'同层档案 · 有求必应屋盲区'}]};
   requirement.nearby={hint:'回到七楼的肖像入口档案；这只是档案导航，不是穿过有求必应屋的路线。',links:[{id:'gryffindor',label:'同层档案 · 格兰芬多塔'}]};
+  const prefectBath=places.find(p=>p.id==='prefect-bath'),myrtle=places.find(p=>p.id==='myrtle');
+  prefectBath.source=official+'fact-file/locations/prefects-bathroom';
+  prefectBath.details=['五楼，糊涂波里斯雕像左边的第四扇门','白色大理石、大浴池、龙头群、跳板、窗帘与毛巾有书中线索','按小说的金框美人鱼画作线索重绘，不是银幕布景的精确复刻','Pine-fresh 是塞德里克在1994—95学年告知哈利的口令，不当作其他年代的现行口令','门位数量与方向有依据，距离、浴室比例和龙头符号数量为缩略重建'];
+  prefectBath.story='1994—95学年，哈利按塞德里克的提示来到这里。在桃金娘的帮助下，他把金蛋放到水下，才听懂了第二个比赛项目的线索。本图不把这个事件画成所有年代都在发生的场景。';
+  prefectBath.evidence=[{label:'官方级长浴室资料：五楼与第四扇门',url:prefectBath.source},{label:'官方专题及小说摘录：浴池陈设',url:official+'features/the-five-places-we-would-most-want-to-visit-at-hogwarts'}];
+  prefectBath.nearby={hint:'金蛋的故事与桃金娘有关。这里只切换档案，不绘制她穿行管道的路线。',links:[{id:'myrtle',label:'关联故事 · 桃金娘的盥洗室'}]};
+  myrtle.nearby={hint:'继续读《火焰杯》中的金蛋线索。这是档案导航，不表示两个浴室相邻。',links:[{id:'prefect-bath',label:'回到五楼 · 级长浴室'}]};
   return {places,floors,eras,sources:S,state,connections,mirrorComparison};
 })();

@@ -22,6 +22,7 @@ Open the cover to reveal the ink. Pan and zoom, then select a building or direct
 - **Find the Room of Requirement note.** The seventh floor draws a tapestry and blank wall, not the hidden room's interior. The question mark is this atlas's margin note, not a room plotted on the original map. No occupants are shown inside.
 - **Compare passage records across eras.** The mirror passage is marked as collapsed in 1993–94. Its 1976 view is conjectural, not evidence of access that year. The 1998 records also include the Ariana portrait passage.
 - **Follow the One-Eyed Witch to Honeydukes.** The third-floor record links to the cellar record in the Hogsmeade volume, with a link back.
+- **Count four doors to the statue's left.** The fifth floor has the Prefects' bathroom, a large pool and mermaid portrait. Linked records lead to Myrtle's story, dated to the 1994–95 school year.
 
 Character routes are illustrative animations, not canonical event replays. Hogsmeade is a companion gazetteer without village character tracking.
 
@@ -35,7 +36,7 @@ Character routes are illustrative animations, not canonical event replays. Hogsm
 
 ![Hogsmeade map](docs/images/hogsmeade.jpg)
 
-The dungeons, ground, third, fourth and seventh floors have their own layouts. The dungeons include cauldron desks, the fruit painting, barrel entrance and two common rooms. The ground floor has the Entrance Hall, House tables and cloisters; the third has statue and tapestry clues; the fourth has the library, Restricted Section and mirror passage. The seventh has a circular common room, the Fat Lady portrait, a tapestry and the blank wall opposite it, preserving the Room of Requirement's map blind spot. The other five floor groups still share a guide layout.
+The dungeons, ground, third, fourth, fifth and seventh floors have their own layouts. They include cauldron desks, the fruit painting, barrel entrance, House tables, statue and tapestry clues, library shelves and the mirror passage. The fifth floor centres on the Prefects' bathroom and four-door address; the seventh preserves the Room of Requirement's blank wall and map blind spot. The other four floor groups still share a guide layout.
 
 <table>
   <tr>
@@ -46,9 +47,11 @@ The dungeons, ground, third, fourth and seventh floors have their own layouts. T
     <td width="50%"><img src="docs/images/third-floor.jpg" alt="Third-floor statue alcove, gallery and tapestry shortcut"><br>Third floor: the One-Eyed Witch and tapestry clues</td>
     <td width="50%"><img src="docs/images/fourth-floor.jpg" alt="Fourth-floor library, Restricted Section and mirror passage"><br>Fourth floor: the library and mirror passage</td>
   </tr>
+  <tr>
+    <td width="50%"><img src="docs/images/fifth-floor.jpg" alt="Fifth-floor pool, mermaid portrait, Boris statue and four doors"><br>Fifth floor: the bath and fourth door</td>
+    <td width="50%"><img src="docs/images/seventh-floor.jpg" alt="Seventh-floor common room, portrait, tapestry and blank wall"><br>Seventh floor: portraits and map blind spot</td>
+  </tr>
 </table>
-
-![Seventh floor: circular common room, portrait entrance, tapestry and blank wall, without a Room of Requirement interior](docs/images/seventh-floor.jpg)
 
 On phones, a directory helps locate places and records open in a separately scrolling lower panel. This screenshot shows the fourth-floor era comparison:
 
@@ -89,7 +92,7 @@ Start with `dist/data.js` for records, `dist/art.js` for floor geometry and rout
 npm run check
 ```
 
-Checks cover scripts, records, assets, animation and routes. The route check currently samples 94,815 positions across 10 floor groups × 3 eras, including clearance for both shoes, and ensures the seventh-floor blind spot is not drawn as a room. This tests internal consistency, not canonical geography or exhaustive real-device compatibility.
+Checks cover scripts, records, assets, animation and routes. The route check currently samples 100,806 positions across 10 floor groups × 3 eras, including clearance for both shoes, the four-door order, dated story and seventh-floor blind spot. This tests internal consistency, not canonical geography or exhaustive real-device compatibility.
 
 Serve `dist/` as the site root. A manually triggered Pages workflow is included: select GitHub Actions under Settings → Pages, then run Actions → Deploy GitHub Pages. It uploads `dist/`; source pushes do not automatically publish a site. Branch-based Pages publishing only accepts the root or `/docs`, not `/dist`. See [GitHub’s documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 

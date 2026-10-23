@@ -47,7 +47,9 @@ window.MAPART = (() => {
     if(type==='cauldron'){o+=path('M-52 -35q-6 67 52 65q58 2 52 -65Z','wash')+path('M-57 -35q57 -15 114 0q-57 14 -114 0M-39 25l-8 17m86 -17l8 17M-47 -25q-39 -15 -24 9m117 -9q38 -15 25 9M-32 -51q-13 -19 0 -29m32 26q-12 -27 1 -37m28 39q15 -16 0 -28');return o}
     if(type==='books'){for(let i=0;i<7;i++)o+=rect(-55+i*16,-49-(i%3)*7,13,78+(i%3)*7,'shade');return o+path('M-67 32H70M-67 37H70','ink')}
     if(type==='basin'){return path('M-66 -16q65 -25 132 0q-66 24 -132 0Z','wash')+path('M-66 -16q1 32 26 40h80q24 -8 26 -40M-13 25v24h26V25M-3 -24v-32q0 -11 17 -8M-10 -47H9M-22 -90H42v-39H-22Z','ink')+path('M5 -128l-5 14 10 7 -3 12','ink hair')}
-    if(type==='bath'){return path('M-77 -31h154v48q-80 35 -154 0Z','wash')+path('M-77 -31q78 -20 154 0q-78 20 -154 0M-56 25l-8 13m120 -13l8 13M-61 -29v-26q0 -18 16 -9M-52 -56h17M-59 -38q22 -7 45 0m9 4q26 -9 59 -3','ink')}
+    if(type==='bath'){let bath=rect(-155,-110,310,150,'bath-rim','rx="6"')+rect(-140,-95,280,120,'bath-water');
+      for(let j=0;j<16;j++)for(const sy of [-101,32])bath+=path(`M${-130+j*17.3} ${sy}v-6h5v4`,'ink hair');
+      return bath+rect(-170,-35,50,13,'wash')+rect(-28,-149,56,31,'shade')+path('M-14 -132q10 -13 19 -2q10 8 16 3m-30 3q-13 5 -13 -2','ink hair');}
     if(type==='trophy'){return path('M-30 -72h60v34q0 28 -30 29q-30 -1 -30 -29ZM-7 -9v30h-21v12h56V21H7V-9M-30 -62h-19v18q0 22 27 26m52 -44h19v18q0 22 -27 26','ink')+path('M-16 -60v20q-1 16 14 18','ink hair')}
     if(type==='mirror'){return rect(-46,-103,92,139,'shade')+rect(-37,-93,74,118,'wash')+path('M-30 13l56 -88m-47 91l45 -72M-35 36v12m70 -12v12','ink hair')}
     if(type==='door'){return path('M-46 33v-98q46 -70 92 0v98ZM-35 33v-96q35 -55 70 0v96','ink')+circle(24,-4,3)+line(-1,-83,-1,32,'ink hair')}
@@ -189,7 +191,21 @@ window.MAPART = (() => {
       [[1010,860],[875,860],[875,495],[735,495]]]
   };
   seventhPlan.cells=[seventhPlan.rooms[0].rect,seventhPlan.portrait,seventhPlan.tapestry,seventhPlan.blankWall,...seventhPlan.stairs];
-  const planFor=f=>f==='dungeon'?dungeonPlan:f==='ground'?groundPlan:f==='third'?thirdPlan:f==='fourth'?fourthPlan:f==='seventh'?seventhPlan:floorPlan;
+  // Four doors are an address clue. Only the bath has a named interior;
+  // the other three door backs deliberately have no invented rooms.
+  const fifthPlan={
+    rooms:[{id:'prefect-bath',rect:[210,270,610,490],door:[710,760,790,760]}],
+    corridors:[[140,810,1310,80],[140,720,70,170],[1380,300,70,590],[710,760,80,50],
+      [920,770,60,40],[1120,770,60,40],[1320,770,60,40]],
+    pool:[285,400,450,235],boris:[1450,700,70,105],
+    doors:[{number:1,x:1350},{number:2,x:1150},{number:3,x:950},{number:4,x:750}],
+    patrols:[[[175,755],[175,845],[1420,845],[1420,340]],
+      [[1400,380],[1400,870],[265,870]],
+      [[350,832],[1230,832]],
+      [[1280,865],[755,865],[755,785]]]
+  };
+  fifthPlan.cells=[fifthPlan.rooms[0].rect,fifthPlan.boris,...fifthPlan.doors.filter(d=>d.number!==4).map(d=>[d.x-25,752,50,18])];
+  const planFor=f=>f==='dungeon'?dungeonPlan:f==='ground'?groundPlan:f==='third'?thirdPlan:f==='fourth'?fourthPlan:f==='fifth'?fifthPlan:f==='seventh'?seventhPlan:floorPlan;
   function dungeonInterior(p,x,y,w,h){let o='';
     if(p.id==='potions'){
       o+=rect(x+22,y+17,w-44,25,'shade','data-potions-shelf="true"');
@@ -380,6 +396,44 @@ window.MAPART = (() => {
     o+=text(800,1040,'同层收录不表示相邻 · 书架、门位、距离与走廊为导览重建','small-label floor-boundary-note');
     return {svg:o+'<g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:fourthPlan};
   }
+  function fifthFloor(){let o=defs+'<g class="fifth-floor">',bounds=[];
+    o+=path('M120 700H230V250H840V740H1360V280H1470V910H120Z','shade');
+    for(const c of fifthPlan.corridors)o+=rect(...c,'ground-walk');
+    o+=path('M140 720V890H1450V300M210 720V810H1380V300M210 890H1380','ink');
+    const room=fifthPlan.rooms[0],[x,y,w,h]=room.rect;
+    bounds.push({id:room.id,x:x+w/2,y:y+h/2,w,h});
+    o+=`<g class="landmark" role="button" tabindex="0" data-place="prefect-bath" aria-label="级长浴室，查看档案">${rect(x,y,w,h,'map-room','data-room="prefect-bath" rx="7"')}${rect(x+12,y+12,w-24,h-24,'ink hair','rx="4"')}`;
+    // Sparse engraved veins suggest marble without changing the newsprint palette.
+    for(let j=0;j<5;j++)o+=path(`M${x+26+j*116} ${y+23}l-7 33 19 18 -9 26m-3 240l8 -24 -13 -17`,'ink hair','style="opacity:.22"');
+    for(const sy of [375,505,635]){o+=rect(214,sy-25,18,50,'wash')+path(`M238 ${sy-35}q22 7 0 35q22 28 0 35m5 -67q9 26 0 32q9 21 0 32`,'ink hair')}
+    o+=rect(265,380,490,275,'bath-rim')+rect(...fifthPlan.pool,'bath-water','data-prefect-pool="true"');
+    o+=rect(292,407,436,221,'ink hair');
+    // A reduced symbol field, not a claim to reproduce every canonical tap.
+    const tap=(tx,ty,a)=>`<g transform="translate(${tx} ${ty}) rotate(${a})" data-bath-tap="true">${path('M-4 1v-6h8v6m-6 -9h4M0 -11v5M-3 -11h6','ink hair')}${circle(0,-11,1.5,'solid')}</g>`;
+    for(let j=0;j<24;j++){o+=tap(294+j*18.7,390,0)+tap(294+j*18.7,645,180)}
+    for(let j=0;j<12;j++){o+=tap(275,410+j*18.7,-90)+tap(745,410+j*18.7,90)}
+    o+=rect(245,500,80,20,'wash','data-diving-board="true"')+line(251,505,318,505)+line(251,515,318,515);
+    for(let j=0;j<4;j++)o+=rect(736+j*2,313-j*5,51-j*4,11,'wash',`data-bath-towel="${j}" rx="3"`);
+    o+=text(515,700,'大浴池 · 魔法龙头群','floor-feature-label')+text(515,735,'级长浴室','room-label')+'</g>';
+    // A modest, original line drawing of the framed mermaid; nobody is bathing.
+    o+=`<g class="landmark mermaid-clue" role="button" tabindex="0" data-place="prefect-bath" aria-label="查看级长浴室的美人鱼画像线索" data-feature-hit="true" data-mermaid-portrait="true">${rect(445,278,140,105,'clue-hit')}${rect(460,285,110,90,'shade')}${rect(467,292,96,76,'wash')}${circle(493,310,7,'ink hair')}${path('M488 303q-12 8 -4 25m13 -25q12 8 3 23M488 319q12 -2 13 15l15 8q22 -7 31 10q-18 -6 -25 6q-14 2 -26 -18h-13l2 -15ZM480 347l17 -7 19 17 -34 3ZM493 334l-6 -10 -11 4','ink hair')}</g>`;
+    // Four numbered door positions to the statue's left. No room behind 1–3 is named.
+    let edge='M865 704';for(let j=0;j<28;j++)edge+=`l20 ${j%2?7:-7}`;o+=path(edge+'V760H865Z','shade');
+    o+=text(1140,350,'从雕像左边数','floor-feature-label')+text(1140,402,'第四扇门 · 级长浴室','floor-feature-label');
+    o+=text(1140,469,'其余门后不补画房间','floor-feature-label');
+    for(const d of fifthPlan.doors){
+      o+=`<g data-address-door="${d.number}">${path(`M${d.x-28} 760v-17h56v17`,'ink')}${text(d.x,725,String(d.number),'door-number')}</g>`;
+      if(d.number!==4)o+=rect(d.x-25,752,50,18,'wash')+circle(d.x+15,760,2,'solid');
+    }
+    o+=path('M710 760H790','door-opening')+path('M710 760v-39q39 0 39 39','ink hair');
+    o+=`<g class="landmark bath-entry" role="button" tabindex="0" data-place="prefect-bath" aria-label="查看雕像左边第四扇门的级长浴室入口" data-feature-hit="true" data-bath-entry="true">${rect(700,715,100,92,'clue-hit')}${text(750,795,'入口 ↗','clue-label')}</g>`;
+    o+=`<g class="landmark boris-clue" role="button" tabindex="0" data-place="prefect-bath" aria-label="查看糊涂波里斯的入口线索" data-feature-hit="true" data-boris-statue="true">${rect(1395,690,180,125,'clue-hit')}${circle(1485,716,11,'shade')}${path('M1470 743q14 -17 30 0l15 43h-59ZM1474 739l-13 -9 10 -15m25 24l13 -9 -10 -15M1455 790h61v9h-61Z','ink')}${text(1485,665,'波里斯','floor-feature-label')}</g>`;
+    for(let j=0;j<20;j++)for(const sy of [818,882])o+=rect(270+j*53,sy,4,4,'ink hair');
+    o+=text(1120,923,'公共走廊 · 不进入浴室','floor-feature-label');
+    o+=`<g class="landmark floor-index-link" role="button" tabindex="0" data-place="myrtle" data-index-x="515" data-index-y="1000" aria-label="翻阅桃金娘的关联故事档案">${rect(350,969,330,62,'clue-hit')}${text(515,1006,'关联故事 · 桃金娘 ↗','clue-label')}</g>`;
+    o+=text(800,1070,'门位线索有依据 · 走廊、比例、陈设位置与龙头符号数量为缩略重建','small-label floor-boundary-note');
+    return {svg:o+'</g><g id="routes" class="routes"></g><g id="people"></g><g id="selectedOverlay"></g>',bounds,plan:fifthPlan};
+  }
   function seventhFloor(era){let o=defs+'<g class="seventh-floor">',bounds=[];
     o+=path('M185 255H690V450H805V250H925V590H1435V720H925V820H1145V940H805V570H690V775H185Z','shade');
     for(const c of seventhPlan.corridors)o+=rect(...c,'ground-walk');
@@ -427,7 +481,7 @@ window.MAPART = (() => {
     [[1115,291],[1095,303],[1107,317],[1142,327],[1170,334]],
     [[826,688],[815,710],[804,738],[809,759],[830,777],[866,792],[906,816]]
   ];
-  function floor(f,era){if(f==='dungeon')return dungeonFloor();if(f==='ground')return groundFloor();if(f==='third')return thirdFloor();if(f==='fourth')return fourthFloor(era);if(f==='seventh')return seventhFloor(era);let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
+  function floor(f,era){if(f==='dungeon')return dungeonFloor();if(f==='ground')return groundFloor();if(f==='third')return thirdFloor();if(f==='fourth')return fourthFloor(era);if(f==='fifth')return fifthFloor();if(f==='seventh')return seventhFloor(era);let o=defs;const rooms=places.filter(p=>p.floor===f);let bounds=[];
     o+=path('M185 214H1415V952H185ZM207 235H1392V930H207Z','shade','fill-rule="evenodd"');
     for(const c of floorPlan.corridors)o+=rect(...c,'wash');
     for(const [x,y] of [[205,242],[1395,242],[205,930],[1395,930]]){o+=circle(x,y,71,'shade')+circle(x,y,55,'ink');for(let i=0;i<18;i++){let a=i*Math.PI/9;o+=line(x+Math.cos(a)*20,y+Math.sin(a)*20,x+Math.cos(a)*53,y+Math.sin(a)*53,'ink hair')}o+=circle(x,y,19)}

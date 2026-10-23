@@ -11,6 +11,7 @@
     ground:{footerY:1006,subtitle:'地面层 · 门厅、礼堂与回廊 · 独立导览布局',index:'从橡木大门看向楼梯，再读礼堂与庭院'},
     third:{subtitle:'三楼 · 独立导览样板 · 连接有据，平面为重建',index:'从雕像开始，顺着线索翻到另一端'},
     fourth:{subtitle:'四楼 · 图书馆与镜后旧路 · 平面为导览重建',index:'先读图书馆，再对照镜后旧路的两个年代'},
+    fifth:{footerY:1000,subtitle:'五楼 · 大浴池与第四扇门 · 平面、门距为导览重建',index:'从波里斯雕像左边数门，再读金蛋与桃金娘的故事'},
     seventh:{footerY:945,subtitle:'七楼 · 肖像入口与空白墙 · 翼廊、距离为导览重建',index:'从胖夫人的肖像走向挂毯，再读墙边的盲区札记'}
   };
   let base=[2400,1500],box={x:0,y:0,w:2400,h:1500},fitWidth=2400,floorBounds=[],floorFrame=null,currentFloorPlan=null,labelObstacles=[],toastTimer,wakeTimer,animationFrame,labelFrame,lastFrame=0,simTime=0,dragged=false,returnFocus=null,overview=true;
@@ -31,6 +32,7 @@
     for(const el of map.querySelectorAll('.room-label'))el.style.fontSize=small?`${Math.min(54,Math.max(23,13/unit))}px`:'';
     for(const el of map.querySelectorAll('.passage-clue')){const label=el.querySelector('.clue-label'),hit=el.querySelector('.clue-hit'),cx=Number(el.dataset.clueX||741),cy=Number(el.dataset.clueY||692);label.style.fontSize=small?`${Math.min(42,Math.max(15,11/unit))}px`:'';const w=Math.max(180,label.getComputedTextLength()+20,small?44/unit:0),h=small?Math.max(88,44/unit):88;hit.setAttribute('x',cx-w/2);hit.setAttribute('y',cy-h/2);hit.setAttribute('width',w);hit.setAttribute('height',h)}
     for(const el of map.querySelectorAll('.floor-feature-label'))el.style.fontSize=small?`${Math.min(40,Math.max(14,11/unit))}px`:'';
+    for(const el of map.querySelectorAll('.door-number'))el.style.fontSize=small?`${Math.min(60,Math.max(28,11/unit))}px`:'';
     for(const el of map.querySelectorAll('.floor-index-link')){const label=el.querySelector('.clue-label'),hit=el.querySelector('.clue-hit'),cx=Number(el.dataset.indexX),cy=Number(el.dataset.indexY||1006);label.style.fontSize=small?`${Math.min(42,Math.max(15,11/unit))}px`:'';const w=Math.max(330,label.getComputedTextLength()+20,small?44/unit:0),h=small?Math.max(62,44/unit):62;hit.setAttribute('x',cx-w/2);hit.setAttribute('y',cy-h/2);hit.setAttribute('width',w);hit.setAttribute('height',h)}
     for(const el of map.querySelectorAll('[data-feature-hit]')){const hit=el.querySelector('.clue-hit');if(!hit.dataset.original)hit.dataset.original=JSON.stringify(['x','y','width','height'].map(k=>Number(hit.getAttribute(k))));const [x,y,ow,oh]=JSON.parse(hit.dataset.original),w=Math.max(ow,small?44/unit:0),h=Math.max(oh,small?44/unit:0);for(const [k,v] of Object.entries({x:x+ow/2-w/2,y:y+oh/2-h/2,width:w,height:h}))hit.setAttribute(k,v)}
     // Suppress only colliding/off-screen labels, never the landmark itself or its hit area.
@@ -43,9 +45,9 @@
         if(!visible||(overlaps&&el.dataset.place!==state.selected))label.style.visibility='hidden';else used.push(r);
       }
     }
-    const vr=canvas.getBoundingClientRect();labelObstacles=[...map.querySelectorAll('.readable-ribbon,.room-label,.floor-feature-label,.passage-clue .clue-label,.floor-index-link .clue-label')].filter(el=>el.style.visibility!=='hidden').map(el=>{const r=el.getBoundingClientRect();return{x:box.x+(r.left-vr.left)/unit,y:box.y+(r.top-vr.top)/unit,w:r.width/unit,h:r.height/unit}});
+    const vr=canvas.getBoundingClientRect();labelObstacles=[...map.querySelectorAll('.readable-ribbon,.room-label,.floor-feature-label,.door-number,.passage-clue .clue-label,.floor-index-link .clue-label')].filter(el=>el.style.visibility!=='hidden').map(el=>{const r=el.getBoundingClientRect();return{x:box.x+(r.left-vr.left)/unit,y:box.y+(r.top-vr.top)/unit,w:r.width/unit,h:r.height/unit}});
     // Doorways and clue hit areas must stay visible, not just their captions.
-    for(const el of map.querySelectorAll('.door-opening,.passage-clue .clue-hit,.floor-index-link .clue-hit,[data-feature-hit] .clue-hit,.blind-question,[data-kitchen-fruit],[data-hufflepuff-barrels]')){const r=el.getBoundingClientRect();labelObstacles.push({x:box.x+(r.left-vr.left-4)/unit,y:box.y+(r.top-vr.top-4)/unit,w:(r.width+8)/unit,h:(r.height+8)/unit})}
+    for(const el of map.querySelectorAll('.door-opening,.passage-clue .clue-hit,.floor-index-link .clue-hit,[data-feature-hit] .clue-hit,.blind-question,[data-prefect-pool],[data-kitchen-fruit],[data-hufflepuff-barrels]')){const r=el.getBoundingClientRect();labelObstacles.push({x:box.x+(r.left-vr.left-4)/unit,y:box.y+(r.top-vr.top-4)/unit,w:(r.width+8)/unit,h:(r.height+8)/unit})}
     updatePeople();syncIndexAccess();const strip=$('#floorStrip'),chosen=strip.querySelector('.chosen');if(!strip.hidden&&chosen){if(chosen.offsetLeft<strip.scrollLeft+4)strip.scrollLeft=Math.max(0,chosen.offsetLeft-4);else if(chosen.offsetLeft+chosen.offsetWidth>strip.scrollLeft+strip.clientWidth-4)strip.scrollLeft=chosen.offsetLeft+chosen.offsetWidth-strip.clientWidth+4}
   }
   function syncIndexAccess(){const small=matchMedia('(max-width:800px)').matches,open=$('#indexPanel').classList.contains('mobile-open');$('#indexPanel').inert=small&&!open;$('#indexBackdrop').hidden=!small||!open;$('#mobileIndex').setAttribute('aria-expanded',String(small&&open))}
