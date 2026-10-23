@@ -18,6 +18,8 @@ The live demo needs no sign-in. You can also download the source and run it loca
 
 Open the cover to reveal the ink. Pan and zoom, then select a building or directory entry to read its record. Switch between the grounds, castle and Hogsmeade; linked passage records let you visit both ends.
 
+Use `↶` on the map or 「← 上一处」 in a record to return to the previous floor, era, camera view and reading position. The phone directory also restores your search and filter.
+
 - **Look for Filch.** The 1993–94 character group includes an illustrative patrol. Left and right footprints stay where they land, then gradually wear away. Pausing also stops their fading.
 - **Find the Room of Requirement note.** The seventh floor draws a tapestry and blank wall, not the hidden room's interior. The question mark is this atlas's margin note, not a room plotted on the original map. No occupants are shown inside.
 - **Compare passage records across eras.** The mirror passage is marked as collapsed in 1993–94. Its 1976 view is conjectural, not evidence of access that year. The 1998 records also include the Ariana portrait passage.
@@ -87,12 +89,15 @@ docs/       Making-of notes, sources and screenshots
 ```
 
 Start with `dist/data.js` for records, `dist/art.js` for floor geometry and routes, and `dist/app.js` for interaction.
+`dist/reading.js` handles reading geometry; `dist/navigation.js` holds the page-local return trail.
 
 ```sh
 npm run check
 ```
 
 Checks cover scripts, records, assets, animation and routes. The route check currently samples 100,806 positions across 10 floor groups × 3 eras, including clearance for both shoes, the four-door order, dated story and seventh-floor blind spot. This tests internal consistency, not canonical geography or exhaustive real-device compatibility.
+
+Return-trail checks cover detached snapshots, bounded history and responsive camera restoration. See [navigation notes](docs/NAVIGATION.md) for behaviour and browser-tested cases.
 
 Serve `dist/` as the site root. A manually triggered Pages workflow is included: select GitHub Actions under Settings → Pages, then run Actions → Deploy GitHub Pages. It uploads `dist/`; source pushes do not automatically publish a site. Branch-based Pages publishing only accepts the root or `/docs`, not `/dist`. See [GitHub’s documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 

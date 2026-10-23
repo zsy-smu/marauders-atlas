@@ -18,6 +18,8 @@
 
 打开封面，墨迹会逐渐显现。拖动、放大地图，点击建筑或目录里的地名，就能打开对应档案。校域、城堡、霍格莫德可以来回切换，密道两端的档案也能互相跳转。
 
+逛远了，点地图上的 `↶` 或档案里的「← 上一处」，可以回到刚才的楼层、年代和视野，接着上次的正文位置读。手机目录里的搜索词和筛选也会保留。
+
 有几处值得找找：
 
 - **费尔奇也在。** 切到 1993—94 年的人物组，可以看到他的示意巡逻。名字向前走，已经落下的左右脚印留在原地，慢慢磨损、消失。暂停时，脚印也停止消退。
@@ -88,6 +90,7 @@ dist/
   styles.css / refinements.css  纸张、排版、动画与移动端样式
   data.js                       地点、来源、年代与关联线索
   art.js                        SVG 平面、家具、热区与路线
+  reading.js / navigation.js    阅读适配、当前页面的探索回程
   app.js                        地图交互、搜索、档案与动画
   assets/                       纸纹、插画与图标
 scripts/                        本地预览与检查脚本
@@ -101,6 +104,8 @@ npm run check
 ```
 
 检查覆盖脚本、档案、资源、动画与路线。目前路线检查包含 10 组楼层 × 3 个年代，采样 100,806 个路径位置并检查双脚余量，另查四扇门的顺序、年代说明与七楼盲区。它验证项目内部的一致性，不证明原著空间准确，也不替代真实设备测试。
+
+回程另有快照、历史条数上限和响应式视野检查；操作边界与浏览器实测见[探索回程](docs/NAVIGATION.md)。
 
 部署时将 `dist/` 作为静态站点根目录。仓库已附手动触发的 Pages 工作流：Settings → Pages 选择 GitHub Actions，再运行 Actions → Deploy GitHub Pages。工作流会上传 `dist/`；推送源码不会自动发布站点。GitHub 的分支部署只能选根目录或 `/docs`，不能直接选 `/dist`。见[官方说明](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)。
 

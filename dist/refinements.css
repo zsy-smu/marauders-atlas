@@ -10,6 +10,11 @@
 .ribbon{fill:#e1d7bd;stroke:#5e5941;stroke-width:1.3}.map-label{fill:#303426;stroke:#e1d7bd;stroke-width:2px}
 .paper .map-title h2{font-size:30px}.paper .map-title p{font-size:11px;color:#685f4a}
 .detail-open .map-stage{margin-right:340px}.map-stage{transition:margin-right .25s}
+.detail-back{position:absolute;left:18px;top:13px;min-height:40px;padding:6px 2px;font:13px var(--serif);color:#75553b}.detail-back:disabled{visibility:hidden}
+.navigation-restoring .map-stage,.navigation-restoring .detail-panel{transition:none!important}
+.detail-panel,.place-list{overflow-anchor:none}
+@media(max-width:800px){.detail-toolbar .detail-back{position:static;min-width:80px;min-height:48px;font-size:14px}}
+@media(max-width:360px){.map-tools #zoomLabel{display:none}}
 @media(max-width:1100px){.detail-open .map-stage{margin-right:318px}.paper .map-title h2{font-size:24px}}
 @media(max-width:800px){.detail-open .map-stage{margin-right:0}.paper .map-title h2{font-size:25px}.canvas{top:112px}.floor-mode .canvas{top:149px}}
 /* Blotted-ink reveal and planted impressions, studied from icochi's animation demo. */

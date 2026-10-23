@@ -7,7 +7,7 @@ import vm from 'node:vm';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = resolve(root, 'dist');
-for (const file of ['data.js', 'art.js', 'reading.js', 'app.js']) {
+for (const file of ['data.js', 'art.js', 'reading.js', 'navigation.js', 'app.js']) {
   execFileSync(process.execPath, ['--check', resolve(dist, file)], { stdio: 'pipe' });
 }
 const context = { window: {} };
@@ -50,4 +50,4 @@ for (const file of sources) {
   }
 }
 assert(!existsSync(resolve(root, '.openai')) && !existsSync(resolve(dist, '.openai')), 'Private hosting metadata must not ship');
-console.log(`OK: 4 scripts; ${places.length} unique records; ${floors.length} floor groups; 3 eras; all static references resolve.`);
+console.log(`OK: 5 scripts; ${places.length} unique records; ${floors.length} floor groups; 3 eras; all static references resolve.`);
